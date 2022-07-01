@@ -1,0 +1,53 @@
+:root{
+    --backgorund-clr : rgb(0, 0, 0);
+    --backgorund-l-clr : rgb(39, 39, 39);
+    --backgorund-a-clr : rgb(0, 255, 128);
+    --backgorund-h-clr : rgb(255, 126, 6);
+    --clr : rgb(255, 247, 234);
+}
+#Nav{
+    background-color: var(--backgorund-clr);
+    display: flex;
+    flex-direction: column;
+    color: var(--clr);
+}
+#NavCon{
+    display: flex;
+    flex-direction: row;
+    margin-left: auto;
+    margin-right: auto;
+}
+#HeadLine{
+    margin-top: 0.2rem;
+    margin-bottom: 0.2rem;
+    margin-left: auto;
+    margin-right: auto;
+}
+#NavSwitch{
+    background-color: var(--backgorund-l-clr);
+    border: 0px;
+    display:none;
+}
+.NavTb{
+    margin-left: 1rem;
+    margin-right: 1rem;
+    min-width: 15vw;
+}
+.NavTg{
+    text-decoration: none;
+    color: var(--clr);
+    font-weight: 400;
+}
+.HeadEr{
+    display: flex;
+    flex-direction: row;
+}
+@media (max-width:600px){
+    #NavSwitch{
+        display: block;
+    }
+    #NavCon{
+        display : none;
+        flex-direction: column;
+    }
+}
