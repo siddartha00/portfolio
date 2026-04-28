@@ -80,14 +80,9 @@ const Portfolio: React.FC<PortfolioProps> = ({ projects }) => {
                   {/* GitHub Icon */}
                   <GithubIcon className="w-5 h-5 hover:text-white transition-colors cursor-pointer" />
 
-                  {/* Mail Icon - Added as per request */}
-                  <Mail className="w-4 h-4 hover:text-white transition-colors cursor-pointer" />
-
                   {/* External Link Icon */}
                   <ExternalLinkIcon className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer" />
 
-                  {/* Linkedin Icon */}
-                  <Linkedin className='className="w-5 h-5 hover:text-white transition-colors cursor-pointer' />
                 </div>
               </div>
             </a>
