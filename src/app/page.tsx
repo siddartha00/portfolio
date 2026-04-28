@@ -26,21 +26,29 @@ const Portfolio: React.FC<PortfolioProps> = ({ projects }) => {
       {/* Main Content Container */}
       <main className="w-full max-w-5xl flex flex-col gap-12 relative z-10">
         {/* Hero Section */}
-        <header className="flex flex-col gap-6 max-w-2xl">
-          <h1 className="text-6xl font-bold tracking-tight text-slate-100">
-            Siddartha
-          </h1>
-          <p className="text-xl text-slate-400 max-w-lg">
-            Full-Stack Engineer specialized in Agentic AI and High-Performance Web Apps.
-          </p>
-
-          {/* Availability Badge with Pulse Animation */}
-          <div className="flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 w-fit animate-pulse">
-            <span className="w-2 h-2 rounded-full bg-emerald-500" />
-            <span className="text-sm font-medium text-emerald-400">
-              Available for new opportunities
-            </span>
+        <header className="flex flex-col items-center justify-between w-full h-[70vh]">
+          <img src="/path/to/your/image.jpg" alt="Profile Photo" className="max-h-48 rounded-full my-16" />
+          <div>
+            <h1 className="text-5xl font-bold tracking-tight text-white">Siddartha</h1>
+            <p className="text-lg text-emerald-300 max-w-md">Full-Stack Engineer specialized in Agentic AI and High-Performance Web Apps.</p>
           </div>
+          <footer className="flex justify-between w-full">
+            <div className="flex flex-col items-start">
+              <a href="mailto:siddartha@example.com" className="text-lg text-emerald-300">Email</a>
+              <a href="tel:+1234567890" className="text-lg text-emerald-300">Phone</a>
+            </div>
+            <div className="flex flex-row gap-4">
+              <a href="https://linkedin.com/in/siddartha" target="_blank" rel="noopener noreferrer" className="text-emerald-500 hover:text-emerald-400">
+                <Linkedin />
+              </a>
+              <a href="https://github.com/siddartha" target="_blank" rel="noopener noreferrer" className="text-emerald-500 hover:text-emerald-400">
+                <GithubIcon />
+              </a>
+              <a href="mailto:siddartha@example.com" target="_blank" rel="noopener noreferrer" className="text-emerald-500 hover:text-emerald-400">
+                <Mail />
+              </a>
+            </div>
+          </footer>
         </header>
 
         {/* Project Grid (2x2 Bento Style) */}
