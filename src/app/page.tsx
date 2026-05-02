@@ -23,6 +23,7 @@ interface Achievement {
   title: string;
   description: string;
   date: string;
+  link?: string;
 }
 
 interface PortfolioProps {
@@ -173,17 +174,34 @@ const Portfolio: React.FC<PortfolioProps> = ({ projects, achievements }) => {
               className="flex transition-transform duration-500 ease-in-out w-full"
               style={{ transform: `translateX(-${currentAchievementIndex * 100}%)` }}
             >
-              {achievements.map((achievement, index) => (
-                <div key={index} className="w-full flex-shrink-0 p-8 md:p-12">
-                  <div className="flex flex-col items-center text-center">
-                    <span className="text-[#00ffd0] font-mono text-sm mb-4 bg-[#00ffd0]/10 px-4 py-1 rounded-full">{achievement.date}</span>
-                    <h3 className="text-2xl font-bold text-white mb-4">{achievement.title}</h3>
-                    <p className="text-slate-400 leading-relaxed text-lg max-w-3xl">
-                      {achievement.description}
-                    </p>
+              {achievements.map((achievement, index) => {
+                const CardWrapper = achievement.link ? 'a' : 'div';
+                const wrapperProps = achievement.link ? { 
+                  href: achievement.link, 
+                  target: "_blank", 
+                  rel: "noopener noreferrer",
+                  className: "flex flex-col items-center text-center group cursor-pointer block w-full h-full" 
+                } : {
+                  className: "flex flex-col items-center text-center"
+                };
+
+                return (
+                  <div key={index} className="w-full flex-shrink-0 p-8 md:p-12">
+                    <CardWrapper {...wrapperProps as any}>
+                      <span className="text-[#00ffd0] font-mono text-sm mb-4 bg-[#00ffd0]/10 px-4 py-1 rounded-full">{achievement.date}</span>
+                      <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-2 group-hover:text-[#00ffd0] transition-colors duration-300">
+                        {achievement.title}
+                        {achievement.link && (
+                          <ExternalLinkIcon className="w-6 h-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        )}
+                      </h3>
+                      <p className="text-slate-400 leading-relaxed text-lg max-w-3xl group-hover:text-slate-300 transition-colors duration-300">
+                        {achievement.description}
+                      </p>
+                    </CardWrapper>
                   </div>
-                </div>
-              ))}
+                );
+              })}
             </div>
             
             {/* Carousel Controls */}
@@ -302,7 +320,8 @@ const mockAchievements: Achievement[] = [
   {
     title: "1st Place: Ford Robotic Gripper Challenge @ StarkHacks",
     description: "Project: Multimodal Compliant Gripper with Force Feedback. Organized by Humanoid Research Organization at Purdue University. Sponsored by AMD, Ford, Espressif, Qualcomm, MLH, and Ultimaker.",
-    date: "April 17-19, 2026"
+    date: "April 17-19, 2026",
+    link: "https://devpost.com/software/multimodal-compliant-gripper-with-force-feedback"
   }
 ];
 
