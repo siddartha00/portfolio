@@ -108,18 +108,18 @@ const Portfolio: React.FC<PortfolioProps> = ({ projects }) => {
         <section id="hero" className="flex flex-col items-center justify-center w-full min-h-[70vh] relative pt-10">
           <img src={profilePic.src} alt="Profile Photo" className="max-h-48 rounded-full mb-8" />
           <div className="text-center">
-            <h1 className="text-5xl font-bold tracking-tight text-white mb-4">Siddartha</h1>
-            <p className="text-lg text-emerald-300 max-w-md mx-auto">Full-Stack Engineer specialized in Agentic AI and High-Performance Web Apps.</p>
+            <h1 className="text-5xl font-bold tracking-tight text-white mb-4">Sai Siddartha, Alleni <br/> Robotics & Software Engineer </h1>
+            <p className="text-lg text-emerald-300 max-w-md mx-auto">MS in Robotics at Purdue University | Ex-Visteon | Specializing in Autonomous Systems, Computer Vision, and Embedded Software. </p>
           </div>
           <footer className="flex justify-center w-full mt-12">
             <div className="flex flex-row gap-6">
-              <a href="https://linkedin.com/in/siddartha" target="_blank" rel="noopener noreferrer" className="text-emerald-500 hover:text-emerald-400 scale-125 transition-transform hover:scale-150">
+              <a href="https://www.linkedin.com/in/sai-siddartha-alleni" target="_blank" rel="noopener noreferrer" className="text-emerald-500 hover:text-emerald-400 scale-125 transition-transform hover:scale-150">
                 <Linkedin />
               </a>
-              <a href="https://github.com/siddartha" target="_blank" rel="noopener noreferrer" className="text-emerald-500 hover:text-emerald-400 scale-125 transition-transform hover:scale-150">
+              <a href="https://github.com/siddartha00" target="_blank" rel="noopener noreferrer" className="text-emerald-500 hover:text-emerald-400 scale-125 transition-transform hover:scale-150">
                 <GithubIcon />
               </a>
-              <a href="mailto:siddartha@example.com" target="_blank" rel="noopener noreferrer" className="text-emerald-500 hover:text-emerald-400 scale-125 transition-transform hover:scale-150">
+              <a href="mailto:allenisaisiddartha@gmail.com" target="_blank" rel="noopener noreferrer" className="text-emerald-500 hover:text-emerald-400 scale-125 transition-transform hover:scale-150">
                 <Mail />
               </a>
             </div>
