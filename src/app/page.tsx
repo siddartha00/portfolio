@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from 'react';
+import profilePic from '../img/zero_bg.png';
 import {
   LuExternalLink as ExternalLinkIcon,
   LuMail as Mail,
@@ -105,7 +106,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ projects }) => {
       <main className="w-full max-w-5xl flex flex-col gap-12 relative z-10 px-6 pt-24 pb-12">
         {/* Hero Section */}
         <section id="hero" className="flex flex-col items-center justify-center w-full min-h-[70vh] relative pt-10">
-          <img src="/path/to/your/image.jpg" alt="Profile Photo" className="max-h-48 rounded-full mb-8" />
+          <img src={profilePic.src} alt="Profile Photo" className="max-h-48 rounded-full mb-8" />
           <div className="text-center">
             <h1 className="text-5xl font-bold tracking-tight text-white mb-4">Siddartha</h1>
             <p className="text-lg text-emerald-300 max-w-md mx-auto">Full-Stack Engineer specialized in Agentic AI and High-Performance Web Apps.</p>
