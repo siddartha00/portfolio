@@ -7,6 +7,8 @@ import {
   LuMail as Mail,
   LuLinkedin as Linkedin,
   LuGithub as GithubIcon,
+  LuChevronLeft as ChevronLeft,
+  LuChevronRight as ChevronRight,
 } from 'react-icons/lu';
 
 // TypeScript interfaces for project data and props
@@ -17,18 +19,27 @@ interface Project {
   image: string;
 }
 
-interface PortfolioProps {
-  projects: Project[];
+interface Achievement {
+  title: string;
+  description: string;
+  date: string;
 }
 
-const Portfolio: React.FC<PortfolioProps> = ({ projects }) => {
+interface PortfolioProps {
+  projects: Project[];
+  achievements: Achievement[];
+}
+
+const Portfolio: React.FC<PortfolioProps> = ({ projects, achievements }) => {
   const [activeTab, setActiveTab] = useState('#hero');
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
+  const [currentAchievementIndex, setCurrentAchievementIndex] = useState(0);
   const navRef = useRef<HTMLDivElement>(null);
 
   const navItems = [
     { name: 'Home', href: '#hero' },
     { name: 'About Me', href: '#about-me' },
+    { name: 'Achievements', href: '#achievements' },
     { name: 'Projects', href: '#projects' },
   ];
 
@@ -76,6 +87,22 @@ const Portfolio: React.FC<PortfolioProps> = ({ projects }) => {
     setActiveTab(href);
     document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' });
   };
+
+  const nextAchievement = () => {
+    setCurrentAchievementIndex((prevIndex) => (prevIndex + 1) % achievements.length);
+  };
+
+  const prevAchievement = () => {
+    setCurrentAchievementIndex((prevIndex) => (prevIndex - 1 + achievements.length) % achievements.length);
+  };
+
+  // Autoplay functionality for carousel
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setCurrentAchievementIndex((prevIndex) => (prevIndex + 1) % achievements.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, [achievements.length]);
 
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center font-sans text-slate-200">
@@ -129,12 +156,65 @@ const Portfolio: React.FC<PortfolioProps> = ({ projects }) => {
         {/* About Me Section */}
         <section id="about-me" className="flex flex-col gap-6 py-20 min-h-[50vh] justify-center">
           <h2 className="text-3xl font-bold text-white mb-2 text-center md:text-left">About Me</h2>
-          <div className="bg-slate-900/50 backdrop-blur-sm p-8 rounded-xl border border-slate-800/50">
+          <div className="bg-slate-900/50 backdrop-blur-sm p-8 rounded-xl border border-slate-800/50 w-full">
             <p className="text-slate-400 leading-relaxed text-lg">
               I am a passionate software engineer with a deep interest in artificial intelligence and web technologies.
               My experience spans across building robust backend systems, creating intuitive user interfaces,
               and integrating advanced AI models to solve real-world problems.
             </p>
+          </div>
+        </section>
+
+        {/* Achievements Section */}
+        <section id="achievements" className="flex flex-col gap-6 py-20 min-h-[50vh] justify-center w-full">
+          <h2 className="text-3xl font-bold text-white mb-2 text-center md:text-left">Achievements</h2>
+          <div className="relative w-full overflow-hidden bg-slate-900/50 backdrop-blur-sm border border-slate-800/50 rounded-xl">
+            <div 
+              className="flex transition-transform duration-500 ease-in-out w-full"
+              style={{ transform: `translateX(-${currentAchievementIndex * 100}%)` }}
+            >
+              {achievements.map((achievement, index) => (
+                <div key={index} className="w-full flex-shrink-0 p-8 md:p-12">
+                  <div className="flex flex-col items-center text-center">
+                    <span className="text-[#00ffd0] font-mono text-sm mb-4 bg-[#00ffd0]/10 px-4 py-1 rounded-full">{achievement.date}</span>
+                    <h3 className="text-2xl font-bold text-white mb-4">{achievement.title}</h3>
+                    <p className="text-slate-400 leading-relaxed text-lg max-w-3xl">
+                      {achievement.description}
+                    </p>
+                  </div>
+                </div>
+              ))}
+            </div>
+            
+            {/* Carousel Controls */}
+            <button 
+              onClick={prevAchievement}
+              className="absolute left-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-slate-800/80 text-white hover:bg-slate-700 hover:text-[#00ffd0] transition-colors focus:outline-none focus:ring-2 focus:ring-[#00ffd0]/50"
+              aria-label="Previous Achievement"
+            >
+              <ChevronLeft className="w-6 h-6" />
+            </button>
+            <button 
+              onClick={nextAchievement}
+              className="absolute right-4 top-1/2 -translate-y-1/2 p-2 rounded-full bg-slate-800/80 text-white hover:bg-slate-700 hover:text-[#00ffd0] transition-colors focus:outline-none focus:ring-2 focus:ring-[#00ffd0]/50"
+              aria-label="Next Achievement"
+            >
+              <ChevronRight className="w-6 h-6" />
+            </button>
+            
+            {/* Carousel Indicators */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2">
+              {achievements.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => setCurrentAchievementIndex(index)}
+                  className={`w-2.5 h-2.5 rounded-full transition-colors ${
+                    currentAchievementIndex === index ? 'bg-[#00ffd0]' : 'bg-slate-700 hover:bg-slate-500'
+                  }`}
+                  aria-label={`Go to slide ${index + 1}`}
+                />
+              ))}
+            </div>
           </div>
         </section>
 
@@ -218,8 +298,16 @@ const mockProjects: Project[] = [
   }
 ];
 
+const mockAchievements: Achievement[] = [
+  {
+    title: "1st Place: Ford Robotic Gripper Challenge @ StarkHacks",
+    description: "Project: Multimodal Compliant Gripper with Force Feedback. Organized by Humanoid Research Organization at Purdue University. Sponsored by AMD, Ford, Espressif, Qualcomm, MLH, and Ultimaker.",
+    date: "April 17-19, 2026"
+  }
+];
+
 export default function App() {
   return (
-    <Portfolio projects={mockProjects} />
+    <Portfolio projects={mockProjects} achievements={mockAchievements} />
   );
 }
