@@ -159,9 +159,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ projects, achievements }) => {
           <h2 className="text-3xl font-bold text-white mb-2 text-center md:text-left">About Me</h2>
           <div className="bg-slate-900/50 backdrop-blur-sm p-8 rounded-xl border border-slate-800/50 w-full">
             <p className="text-slate-400 leading-relaxed text-lg">
-              I am a passionate software engineer with a deep interest in artificial intelligence and web technologies.
-              My experience spans across building robust backend systems, creating intuitive user interfaces,
-              and integrating advanced AI models to solve real-world problems.
+             I bridge the gap between low-level embedded systems and high-level autonomous intelligence. With a foundation in automotive software engineering at Visteon and a Master’s in Robotics from Purdue, I specialize in making robots perceive, reason, and move in complex environments. From winning the Ford Robotics Gripper Challenge to training quadrupedal gaits in NVIDIA Isaac Lab, I thrive on solving the "sim-to-real" challenge. My toolkit spans ROS2, Deep Reinforcement Learning, and Real-Time Systems (RTOS), driven by a mission to build the next generation of reliable, autonomous machines.
             </p>
           </div>
         </section>
