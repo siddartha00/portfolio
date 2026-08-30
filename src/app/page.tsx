@@ -9,17 +9,30 @@ import {
   LuGithub as GithubIcon,
   LuChevronLeft as ChevronLeft,
   LuChevronRight as ChevronRight,
+  LuLayers as LayersIcon,
+  LuX as CloseIcon,
+  LuUser as UserIcon,
+  LuUsers as UsersIcon,
+  LuMaximize2 as MaximizeIcon,
 } from 'react-icons/lu';
 
 // TypeScript interfaces for project data and props
-interface Project {
+export interface Project {
+  id: string;
   title: string;
-  description: string;
-  link: string;
-  image: string;
+  category: 'Solo' | 'Group';
+  subtitle?: string;
+  overview: string;
+  summaryPoints: string[];
+  fullDetails: string[];
+  metrics?: string;
+  role?: string[];
+  githubUrl: string;
+  image?: string;
+  tags: string[];
 }
 
-interface Achievement {
+export interface Achievement {
   title: string;
   description: string;
   date: string;
@@ -35,6 +48,8 @@ const Portfolio: React.FC<PortfolioProps> = ({ projects, achievements }) => {
   const [activeTab, setActiveTab] = useState('#hero');
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
   const [currentAchievementIndex, setCurrentAchievementIndex] = useState(0);
+  const [selectedProject, setSelectedProject] = useState<Project | null>(null);
+  const [projectFilter, setProjectFilter] = useState<'All' | 'Solo' | 'Group'>('All');
   const navRef = useRef<HTMLDivElement>(null);
 
   const navItems = [
@@ -83,6 +98,27 @@ const Portfolio: React.FC<PortfolioProps> = ({ projects, achievements }) => {
     return () => window.removeEventListener('resize', updateIndicator);
   }, [activeTab]);
 
+  // Lock body scroll and listen for Escape key when island modal is open
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') {
+        setSelectedProject(null);
+      }
+    };
+
+    if (selectedProject) {
+      document.body.style.overflow = 'hidden';
+      window.addEventListener('keydown', handleKeyDown);
+    } else {
+      document.body.style.overflow = 'unset';
+    }
+
+    return () => {
+      document.body.style.overflow = 'unset';
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [selectedProject]);
+
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
     setActiveTab(href);
@@ -105,10 +141,15 @@ const Portfolio: React.FC<PortfolioProps> = ({ projects, achievements }) => {
     return () => clearInterval(timer);
   }, [achievements.length]);
 
+  const filteredProjects = projects.filter((p) => {
+    if (projectFilter === 'All') return true;
+    return p.category === projectFilter;
+  });
+
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center font-sans text-slate-200">
       {/* Navigation - Occupies entire width of container, no visible borders */}
-      <nav className="fixed top-0 left-0 w-full z-50 bg-slate-950/90 backdrop-blur-lg flex justify-center">
+      <nav className="fixed top-0 left-0 w-full z-40 bg-slate-950/90 backdrop-blur-lg flex justify-center">
         <div className="w-full max-w-5xl flex relative" ref={navRef}>
           {navItems.map((item) => (
             <a
@@ -234,83 +275,414 @@ const Portfolio: React.FC<PortfolioProps> = ({ projects, achievements }) => {
           </div>
         </section>
 
-        {/* Project Grid (2x2 Bento Style) */}
-        <section id="projects" className="py-20 min-h-[70vh]">
-          <h2 className="text-3xl font-bold text-white mb-8 text-center md:text-left">Projects</h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-            {projects.map((project, index) => (
-              <a
-                key={index}
-                href={project.link}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="group relative flex flex-col p-6 bg-slate-900/50 backdrop-blur-sm border border-slate-800 rounded-xl overflow-hidden hover:border-slate-700 transition-colors duration-300 justify-between h-full min-h-[250px]"
+        {/* Projects Section - Compact Vertical Tiles with Island Modal */}
+        <section id="projects" className="py-20 min-h-[70vh] w-full">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+            <div>
+              <h2 className="text-3xl font-bold text-white text-center sm:text-left">Projects</h2>
+              <p className="text-slate-400 text-sm mt-1 text-center sm:text-left">Click any project tile to view the complete technical details</p>
+            </div>
+
+            {/* Filter Pills */}
+            <div className="flex items-center justify-center sm:justify-end gap-1.5 p-1 bg-slate-900/80 border border-slate-800 rounded-xl">
+              {(['All', 'Solo', 'Group'] as const).map((filter) => (
+                <button
+                  key={filter}
+                  onClick={() => setProjectFilter(filter)}
+                  className={`px-3.5 py-1.5 rounded-lg text-xs font-semibold uppercase tracking-wider transition-all duration-200 ${
+                    projectFilter === filter
+                      ? 'bg-[#00ffd0]/20 text-[#00ffd0] border border-[#00ffd0]/40 shadow-sm'
+                      : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
+                  }`}
+                >
+                  {filter === 'All' ? 'All (6)' : filter === 'Solo' ? 'Solo (4)' : 'Group (2)'}
+                </button>
+              ))}
+            </div>
+          </div>
+          
+          <div className="flex flex-col gap-5 w-full">
+            {filteredProjects.map((project) => (
+              <div
+                key={project.id}
+                onClick={() => setSelectedProject(project)}
+                className="group relative flex flex-col sm:flex-row bg-slate-900/50 hover:bg-slate-900/80 backdrop-blur-sm border border-slate-800/80 hover:border-[#00ffd0]/40 rounded-xl overflow-hidden transition-all duration-300 shadow-md hover:shadow-[0_0_20px_rgba(0,255,208,0.08)] cursor-pointer"
               >
-                {/* Hover overlay gradient */}
-                <div className="absolute inset-0 bg-slate-800/20 opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
+                {/* Subtle hover gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/[0.03] to-[#00ffd0]/[0.03] opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
-                <div className="relative z-10 flex-1">
-                  <div className="w-12 h-12 rounded-lg bg-slate-800 mb-4 flex items-center justify-center text-slate-400 group-hover:text-white group-hover:bg-slate-700 transition-all">
-                    {/* Placeholder Icon based on index for demo purposes */}
-                    {index % 2 === 0 ? (
-                      <span className="text-xl font-bold">AI</span>
-                    ) : (
-                      <span className="text-xl font-bold">WEB</span>
-                    )}
-                  </div>
+                {/* Left Side: Compact Project Photo / Preview */}
+                <div className="relative w-full sm:w-44 md:w-52 h-36 sm:h-auto min-h-[140px] md:min-h-[150px] bg-slate-950/80 shrink-0 overflow-hidden flex items-center justify-center border-b sm:border-b-0 sm:border-r border-slate-800/60">
+                  {project.image ? (
+                    <img
+                      src={project.image}
+                      alt={project.title}
+                      className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                    />
+                  ) : (
+                    <div className="w-full h-full flex flex-col items-center justify-center p-4 bg-gradient-to-br from-slate-900 via-slate-950 to-slate-900 text-slate-600 group-hover:text-emerald-400/80 transition-colors">
+                      <LayersIcon className="w-8 h-8 mb-1 stroke-[1.5]" />
+                      <span className="text-[10px] uppercase tracking-widest font-mono text-slate-500">Preview</span>
+                    </div>
+                  )}
 
-                  <h3 className="text-xl font-semibold text-slate-100 mb-2">
-                    {project.title}
-                  </h3>
-                  <p className="text-slate-400 text-sm line-clamp-3">
-                    {project.description}
-                  </p>
+                  {/* Category Pill on Image */}
+                  <span
+                    className={`absolute top-2.5 left-2.5 inline-flex items-center gap-1 text-[11px] font-medium font-mono px-2 py-0.5 rounded-md backdrop-blur-md ${
+                      project.category === 'Solo'
+                        ? 'bg-slate-950/80 text-[#00ffd0] border border-[#00ffd0]/30'
+                        : 'bg-slate-950/80 text-amber-300 border border-amber-400/30'
+                    }`}
+                  >
+                    {project.category === 'Solo' ? <UserIcon className="w-3 h-3" /> : <UsersIcon className="w-3 h-3" />}
+                    {project.category}
+                  </span>
                 </div>
 
-                <div className="relative z-10 mt-6 flex items-center justify-between text-slate-400 text-sm group-hover:text-white transition-colors">
-                  <span>View Source</span>
-                  <div className="flex items-center gap-2">
-                    {/* GitHub Icon */}
-                    <GithubIcon className="w-5 h-5 hover:text-white transition-colors cursor-pointer" />
+                {/* Right Side: Project Summary & Actions */}
+                <div className="relative z-10 flex-1 p-4 md:p-5 flex flex-col justify-between">
+                  <div>
+                    {/* Top line: Tags */}
+                    <div className="flex flex-wrap items-center gap-1.5 mb-2">
+                      {project.tags.slice(0, 3).map((tag, tagIdx) => (
+                        <span
+                          key={tagIdx}
+                          className="text-[11px] font-mono px-2 py-0.5 rounded-full bg-slate-800/80 text-emerald-300/90 border border-emerald-500/20"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                      {project.tags.length > 3 && (
+                        <span className="text-[10px] font-mono px-1.5 py-0.5 text-slate-500">
+                          +{project.tags.length - 3} more
+                        </span>
+                      )}
+                    </div>
 
-                    {/* External Link Icon */}
-                    <ExternalLinkIcon className="w-4 h-4 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer" />
+                    {/* Compact Title */}
+                    <h3 className="text-lg md:text-xl font-bold text-white mb-2 group-hover:text-[#00ffd0] transition-colors duration-300 flex items-center gap-2">
+                      <span>{project.title}</span>
+                    </h3>
+
+                    {/* Compact 2-bullet Overview */}
+                    <ul className="space-y-1.5 text-slate-300/85 text-xs md:text-sm leading-relaxed">
+                      {project.summaryPoints.map((point, pointIdx) => (
+                        <li key={pointIdx} className="flex items-start gap-2">
+                          <span className="text-[#00ffd0] mt-0.5 text-xs shrink-0 select-none">▸</span>
+                          <span className="line-clamp-2">{point}</span>
+                        </li>
+                      ))}
+                    </ul>
+                  </div>
+
+                  {/* Bottom Bar: Island Modal Trigger + GitHub Link */}
+                  <div className="flex items-center justify-between pt-3 mt-3 border-t border-slate-800/60">
+                    <button
+                      type="button"
+                      className="inline-flex items-center gap-1.5 text-xs font-semibold text-slate-400 group-hover:text-[#00ffd0] transition-colors"
+                    >
+                      <MaximizeIcon className="w-3.5 h-3.5" />
+                      <span>Full Details & Architecture</span>
+                    </button>
+
+                    {/* GitHub Link: Prevent tile modal click */}
+                    <a
+                      href={project.githubUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={(e) => e.stopPropagation()}
+                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/60 hover:border-[#00ffd0]/50 text-xs font-medium transition-all duration-200 group/btn"
+                      aria-label={`GitHub repository for ${project.title}`}
+                    >
+                      <GithubIcon className="w-3.5 h-3.5 text-emerald-400 group-hover/btn:text-[#00ffd0] transition-colors" />
+                      <span>GitHub</span>
+                      <ExternalLinkIcon className="w-3 h-3 opacity-60 group-hover/btn:opacity-100 group-hover/btn:translate-x-0.5 transition-all" />
+                    </a>
                   </div>
                 </div>
-              </a>
+              </div>
             ))}
           </div>
         </section>
       </main>
+
+      {/* ==========================================
+          Island-Style Modal Window for Full Details
+          ========================================== */}
+      {selectedProject && (
+        <div
+          role="dialog"
+          aria-modal="true"
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-8 bg-slate-950/80 backdrop-blur-md transition-all duration-300"
+          onClick={() => setSelectedProject(null)}
+        >
+          {/* Island Modal Card */}
+          <div
+            className="relative w-full max-w-2xl max-h-[88vh] bg-slate-900/95 border border-slate-700/90 rounded-2xl p-6 md:p-8 overflow-y-auto shadow-2xl shadow-cyan-950/40 flex flex-col gap-6 text-slate-200 transition-all duration-300"
+            onClick={(e) => e.stopPropagation()}
+          >
+            {/* Header: Type Badge, Institution & Close Button */}
+            <div className="flex items-start justify-between gap-4">
+              <div className="flex flex-col gap-1">
+                <div className="flex items-center gap-2">
+                  <span
+                    className={`inline-flex items-center gap-1.5 text-xs font-mono font-medium px-2.5 py-0.5 rounded-md ${
+                      selectedProject.category === 'Solo'
+                        ? 'bg-[#00ffd0]/10 text-[#00ffd0] border border-[#00ffd0]/30'
+                        : 'bg-amber-400/10 text-amber-300 border border-amber-400/30'
+                    }`}
+                  >
+                    {selectedProject.category === 'Solo' ? <UserIcon className="w-3 h-3" /> : <UsersIcon className="w-3 h-3" />}
+                    {selectedProject.category} Project
+                  </span>
+                  <span className="text-xs font-mono text-slate-400">• Purdue University</span>
+                </div>
+                <h3 className="text-2xl md:text-3xl font-bold text-white mt-1">
+                  {selectedProject.title}
+                </h3>
+                {selectedProject.subtitle && (
+                  <p className="text-sm text-emerald-300/90 font-medium">
+                    {selectedProject.subtitle}
+                  </p>
+                )}
+              </div>
+
+              {/* Close Button */}
+              <button
+                type="button"
+                onClick={() => setSelectedProject(null)}
+                className="p-2 rounded-xl bg-slate-800 text-slate-400 hover:text-white hover:bg-slate-700 transition-colors border border-slate-700 shrink-0"
+                aria-label="Close island window"
+              >
+                <CloseIcon className="w-5 h-5" />
+              </button>
+            </div>
+
+            {/* Key Metric Highlight */}
+            {selectedProject.metrics && (
+              <div className="bg-slate-950/70 border border-emerald-500/20 rounded-xl px-4 py-2.5 flex items-center justify-between gap-3">
+                <span className="text-xs font-mono text-slate-400 uppercase tracking-wider">Key Performance Metric</span>
+                <span className="text-sm font-mono font-bold text-[#00ffd0]">{selectedProject.metrics}</span>
+              </div>
+            )}
+
+            {/* Tech Stack Badges */}
+            <div className="flex flex-wrap gap-2">
+              {selectedProject.tags.map((tag, tagIdx) => (
+                <span
+                  key={tagIdx}
+                  className="text-xs font-mono px-3 py-1 rounded-full bg-slate-800/90 text-emerald-300 border border-emerald-500/25"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+
+            {/* Project Overview */}
+            <div className="bg-slate-950/50 p-4 rounded-xl border border-slate-800/60">
+              <h4 className="text-xs uppercase tracking-widest font-mono text-slate-400 mb-2">Project Overview</h4>
+              <p className="text-slate-300 text-sm md:text-base leading-relaxed">
+                {selectedProject.overview}
+              </p>
+            </div>
+
+            {/* Comprehensive Technical Highlights */}
+            <div>
+              <h4 className="text-xs uppercase tracking-widest font-mono text-slate-400 mb-3">Key Technical Highlights & Implementation</h4>
+              <ul className="space-y-2.5 text-sm md:text-base text-slate-300 leading-relaxed">
+                {selectedProject.fullDetails.map((detail, idx) => (
+                  <li key={idx} className="flex items-start gap-2.5">
+                    <span className="text-[#00ffd0] mt-1 text-sm shrink-0 select-none">▸</span>
+                    <span>{detail}</span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+
+            {/* Specific Group Project Role & Contribution (if applicable) */}
+            {selectedProject.role && selectedProject.role.length > 0 && (
+              <div className="bg-emerald-950/20 border-l-4 border-[#00ffd0] p-4 rounded-r-xl">
+                <h4 className="text-xs uppercase tracking-widest font-mono text-[#00ffd0] font-semibold mb-2">My Role & Specific Contributions</h4>
+                <ul className="space-y-2 text-sm text-slate-300 leading-relaxed">
+                  {selectedProject.role.map((r, rIdx) => (
+                    <li key={rIdx} className="flex items-start gap-2">
+                      <span className="text-[#00ffd0] mt-1 text-xs shrink-0 select-none">✔</span>
+                      <span>{r}</span>
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            )}
+
+            {/* Footer Actions */}
+            <div className="flex items-center justify-between pt-4 border-t border-slate-800 mt-2">
+              <a
+                href={selectedProject.githubUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 hover:border-[#00ffd0]/50 hover:shadow-[0_0_15px_rgba(0,255,208,0.2)] text-sm font-medium transition-all"
+              >
+                <GithubIcon className="w-4 h-4 text-[#00ffd0]" />
+                <span>View on GitHub</span>
+                <ExternalLinkIcon className="w-4 h-4 opacity-70" />
+              </a>
+
+              <button
+                type="button"
+                onClick={() => setSelectedProject(null)}
+                className="px-4 py-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white text-sm font-medium transition-colors"
+              >
+                Close
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
 
-// Mock data for demonstration
+// =========================================================================
+// Real Projects Data (Purdue University: Solo & Group Projects)
+// =========================================================================
 const mockProjects: Project[] = [
+  // --- Solo Projects ---
   {
-    title: "Agentic Orchestration Core",
-    description: "A high-performance background service built with Rust and Next.js that manages complex multi-agent workflows with sub-millisecond latency.",
-    link: "https://github.com/example/orchestration-core",
-    image: "/api/placeholder/400/300", // Placeholder for image
+    id: "quadruped-blind-locomotion",
+    title: "Quadruped Blind Locomotion via Asymmetric Actor-Critic",
+    category: "Solo",
+    subtitle: "Proprioceptive terrain walking on Unitree Go2 with NVIDIA Isaac Lab",
+    overview: "Trained a Unitree Go2 quadruped robot to traverse challenging and uneven terrains using purely proprioceptive feedback through Asymmetric Actor-Critic reinforcement learning in Isaac Sim.",
+    summaryPoints: [
+      "Trained Unitree Go2 across 6 diverse terrains (stairs, uneven ground, random grids) using Isaac Sim proprioception.",
+      "Achieved 90% stable gait success rate across all terrains leveraging 2,000 parallel environments in Isaac Lab."
+    ],
+    fullDetails: [
+      "Trained a Unitree Go2 quadruped on multiple challenging terrains to walk using purely proprioceptive feedback in Isaac Sim.",
+      "Engineered a training pipeline spanning six distinct terrain topologies, including stairs, uneven slopes, and randomized height grids.",
+      "Scaled training throughput by simulating 2,000 parallel environments simultaneously using Isaac Lab's GPU-accelerated architecture.",
+      "Designed a custom ray-caster sensor reward function that penalizes deviation from target ground clearance, maintaining consistent body height.",
+      "Achieved a 90% stable gait success rate across all evaluated terrain types."
+    ],
+    metrics: "90% Stable Gait Success Rate across 6 Terrains",
+    githubUrl: "https://github.com/siddartha00/quadruped-blind-locomotion",
+    image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=800&q=80",
+    tags: ["Isaac Lab", "Unitree Go2", "PPO", "Reinforcement Learning", "Isaac Sim", "Python"]
   },
   {
-    title: "Neural UI Designer",
-    description: "An experimental browser extension that generates component code directly in the canvas using LLM agents to speed up prototyping.",
-    link: "https://github.com/example/neural-ui",
-    image: "/api/placeholder/400/300", // Placeholder for image
+    id: "so-arm-moveit2-control",
+    title: "Sim-to-Sim SO-ARM Manipulation via ROS 2 & MoveIt 2",
+    category: "Solo",
+    subtitle: "Containerized robotic arm manipulation and classical CV perception",
+    overview: "Sim-to-sim manipulation pipeline controlling a SO-ARM manipulator in Isaac Sim with MoveIt 2 inside Docker, using camera intrinsics and Behavior Trees for deterministic pick-and-place execution.",
+    summaryPoints: [
+      "Controlled simulated SO-ARM in Isaac Sim with MoveIt 2 running inside a Docker container.",
+      "Employed classical CV and camera intrinsics with Behavior Trees for deterministic pick-and-place grasping."
+    ],
+    fullDetails: [
+      "Controlled a SO-ARM manipulator simulated in Isaac Sim to execute pick-and-place tasks using MoveIt 2 motion planning.",
+      "Containerized the ROS 2 and MoveIt 2 planning stack inside Docker for reproducible simulation execution.",
+      "Estimated precise 3D object grasping poses using classical computer vision pipelines and calibrated camera intrinsics.",
+      "Architected high-level task execution with ROS 2 Node Lifecycles and Behavior Trees to ensure deterministic, fault-tolerant state transitions."
+    ],
+    metrics: "Deterministic Behavior Tree State Execution",
+    githubUrl: "https://github.com/siddartha00/so-arm-ros2-moveit2",
+    image: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80",
+    tags: ["ROS 2", "MoveIt 2", "Isaac Sim", "Docker", "Behavior Trees", "Computer Vision", "C++"]
   },
   {
-    title: "Quantum Finance Dashboard",
-    description: "Real-time data visualization platform handling millions of ticks per second using WebGL and WebGL shaders.",
-    link: "https://github.com/example/quantum-finance",
-    image: "/api/placeholder/400/300", // Placeholder for image
+    id: "autonomous-slam-frontier-nav2",
+    title: "Autonomous Frontier Exploration & SLAM with Nav2",
+    category: "Solo",
+    subtitle: "Occupancy grid frontier exploration and obstacle-aware navigation",
+    overview: "Autonomous mobile robot exploration system that identifies map frontiers on occupancy grids using OpenCV and navigates via Nav2 and SLAM in ROS 2 Gazebo.",
+    summaryPoints: [
+      "Autonomous exploration searching for map frontiers on occupancy grids with OpenCV & Nav2.",
+      "Fused bumper collision data into occupancy maps, reducing slippage failure rate to <5%."
+    ],
+    fullDetails: [
+      "Engineered an autonomous exploration framework searching for unmapped frontiers using OpenCV image processing on live occupancy grid maps.",
+      "Integrated Nav2 navigation stack in ROS 2 for dynamic path generation and obstacle avoidance.",
+      "Fused physical bumper collision data directly into occupancy grid obstacle layers to prevent stationary Gazebo docking station collisions.",
+      "Achieved a low algorithm failure rate of <5% from slippage during complex exploration runs."
+    ],
+    metrics: "<5% Slippage Failure Rate",
+    githubUrl: "https://github.com/siddartha00/frontier-nav2-slam",
+    image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80",
+    tags: ["ROS 2", "Nav2", "SLAM", "OpenCV", "Gazebo", "Autonomous Navigation", "Python"]
   },
   {
-    title: "OpenSource AI Helper",
-    description: "A comprehensive toolchain designed to assist developers in integrating LLMs into legacy codebases with strict type safety.",
-    link: "https://github.com/example/ai-helper",
-    image: "/api/placeholder/400/300", // Placeholder for image
+    id: "ur10-realworld-sorting-servoing",
+    title: "Real-World UR10 Sorting & Visual Servoing",
+    category: "Solo",
+    subtitle: "Industrial manipulator vision-guided sorting with Intel RealSense",
+    overview: "Physical sorting workcell programmed on a UR10 industrial manipulator utilizing Intel RealSense 3D camera intrinsics and contour detection for real-time visual servoing.",
+    summaryPoints: [
+      "Programmed physical UR10 industrial robot arm for automated object sorting with Intel RealSense.",
+      "Implemented contour-based orientation extraction and visual servoing with <2% failure rate."
+    ],
+    fullDetails: [
+      "Programmed a physical UR10 industrial robot arm to autonomously sort objects in real-world workspace environments.",
+      "Extracted accurate real-world 3D coordinates using Intel RealSense depth sensing and calibrated camera intrinsic matrices.",
+      "Applied classical computer vision contour analysis to compute object area, centroid, and bounding orientation in real-time.",
+      "Implemented closed-loop visual servoing to dynamically align the gripper with object orientation, achieving <2% sorting failure rate."
+    ],
+    metrics: "<2% Sorting Failure Rate in Physical Tests",
+    githubUrl: "https://github.com/siddartha00/ur10-realworld-sorting",
+    image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=800&q=80",
+    tags: ["UR10", "Intel RealSense", "Visual Servoing", "OpenCV", "Robotics", "Python"]
+  },
+
+  // --- Group Projects ---
+  {
+    id: "hrl-spot-navigation-door-manipulation",
+    title: "Hierarchical RL Navigation & Door Manipulation on Spot",
+    category: "Group",
+    subtitle: "Multi-policy HRL collision avoidance and vision-guided door opening on Boston Dynamics Spot",
+    overview: "Hierarchical Reinforcement Learning framework coordinating Boston Dynamics Spot quadruped base locomotion, collision avoidance, and arm manipulation to detect, open, and navigate through doors.",
+    summaryPoints: [
+      "Multi-policy HRL coordinating Spot quadruped locomotion, obstacle avoidance, and arm door opening.",
+      "YOLO11 + PCA orientation estimation for door handle grasping with 60% end-to-end success rate."
+    ],
+    fullDetails: [
+      "Hierarchical Reinforcement Learning (HRL) architecture coordinating low-level locomotion primitives (walking, turning) to navigate toward target poses on Boston Dynamics Spot.",
+      "Trained Soft Actor-Critic (SAC) HRL policy to articulate the robotic arm for door opening and holding while walking through doorways.",
+      "Trained a custom YOLO11 detector for door and handle detection, using Principal Component Analysis (PCA) on segmentation masks to extract 3D handle orientation.",
+      "Achieved a 60% end-to-end success rate for approaching, opening, holding the door, and passing through while avoiding dynamic obstacles."
+    ],
+    role: [
+      "Created the HRL navigation and collision avoidance policy using RGB-D depth camera feedback.",
+      "Built the computer vision model that detects real-world door coordinates and door handle 3D orientation for navigation and grasping."
+    ],
+    metrics: "60% End-to-End Clearance Success Rate",
+    githubUrl: "https://github.com/siddartha00/spot-hrl-door-navigation",
+    image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80",
+    tags: ["Boston Dynamics Spot", "HRL", "SAC", "YOLO11", "PCA", "RGB-D Vision", "PyTorch"]
+  },
+  {
+    id: "multi-robot-industrial-pipeline",
+    title: "Multi-Robot Production Cell: TM12 Arms & Fetch AMR",
+    category: "Group",
+    subtitle: "Industrial manufacturing coordination across dual Techman TM12 arms and Fetch AMR",
+    overview: "Synchronized industrial manufacturing cell orchestrating two Techman TM12 robotic arms and a Fetch Robotics AMR for precision parts loading, transfer, and swapping in a production pipeline.",
+    summaryPoints: [
+      "Orchestrated two Techman TM12 robot arms and a Fetch AMR with 1mm movement precision.",
+      "Automated end-to-end parts loading, transfer, and swap pipeline synchronized via Modbus & Node-RED."
+    ],
+    fullDetails: [
+      "Orchestrated an automated multi-station production cycle swapping parts between dual Techman TM12 robotic arms and a Fetch AMR.",
+      "Station 1 TM12 loads items into a tumbler on the AMR trolley; AMR traverses to Station 2 for part swap; AMR returns to Station 1 for unloading.",
+      "Achieved 1mm movement precision across robot arm docking and part manipulation operations.",
+      "Built real-time inter-robot communication and synchronization using Node-RED and Modbus messaging."
+    ],
+    role: [
+      "Designed the AMR autonomous scheduling and transit workflows using FetchCore fleet management software.",
+      "Implemented Node-RED and Modbus communication layer for real-time synchronization between the robotic arms and mobile robot."
+    ],
+    metrics: "1mm Precision Multi-Robot Synchronization",
+    githubUrl: "https://github.com/siddartha00/multi-robot-coordination-cell",
+    image: "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?auto=format&fit=crop&w=800&q=80",
+    tags: ["Techman TM12", "Fetch AMR", "Node-RED", "Modbus", "FetchCore", "Industrial Automation"]
   }
 ];
 
@@ -328,3 +700,4 @@ export default function App() {
     <Portfolio projects={mockProjects} achievements={mockAchievements} />
   );
 }
+
