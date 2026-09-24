@@ -565,7 +565,7 @@ const mockProjects: Project[] = [
       "Achieved a 90% stable gait success rate across all evaluated terrain types."
     ],
     metrics: "90% Stable Gait Success Rate across 6 Terrains",
-    githubUrl: "https://github.com/siddartha00/quadruped-blind-locomotion",
+    githubUrl: "https://github.com/siddartha00/go2_blindWalk",
     image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=800&q=80",
     tags: ["Isaac Lab", "Unitree Go2", "PPO", "Reinforcement Learning", "Isaac Sim", "Python"]
   },
