@@ -569,27 +569,27 @@ const mockProjects: Project[] = [
     image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=800&q=80",
     tags: ["Isaac Lab", "Unitree Go2", "PPO", "Reinforcement Learning", "Isaac Sim", "Python"]
   },
-  {
-    id: "so-arm-moveit2-control",
-    title: "Sim-to-Sim SO-ARM Manipulation via ROS 2 & MoveIt 2",
-    category: "Solo",
-    subtitle: "Containerized robotic arm manipulation and classical CV perception",
-    overview: "Sim-to-sim manipulation pipeline controlling a SO-ARM manipulator in Isaac Sim with MoveIt 2 inside Docker, using camera intrinsics and Behavior Trees for deterministic pick-and-place execution.",
-    summaryPoints: [
-      "Controlled simulated SO-ARM in Isaac Sim with MoveIt 2 running inside a Docker container.",
-      "Employed classical CV and camera intrinsics with Behavior Trees for deterministic pick-and-place grasping."
-    ],
-    fullDetails: [
-      "Controlled a SO-ARM manipulator simulated in Isaac Sim to execute pick-and-place tasks using MoveIt 2 motion planning.",
-      "Containerized the ROS 2 and MoveIt 2 planning stack inside Docker for reproducible simulation execution.",
-      "Estimated precise 3D object grasping poses using classical computer vision pipelines and calibrated camera intrinsics.",
-      "Architected high-level task execution with ROS 2 Node Lifecycles and Behavior Trees to ensure deterministic, fault-tolerant state transitions."
-    ],
-    metrics: "Deterministic Behavior Tree State Execution",
-    githubUrl: "https://github.com/siddartha00/so-arm-ros2-moveit2",
-    image: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80",
-    tags: ["ROS 2", "MoveIt 2", "Isaac Sim", "Docker", "Behavior Trees", "Computer Vision", "C++"]
-  },
+  // {
+  //   id: "so-arm-moveit2-control",
+  //   title: "Sim-to-Sim SO-ARM Manipulation via ROS 2 & MoveIt 2",
+  //   category: "Solo",
+  //   subtitle: "Containerized robotic arm manipulation and classical CV perception",
+  //   overview: "Sim-to-sim manipulation pipeline controlling a SO-ARM manipulator in Isaac Sim with MoveIt 2 inside Docker, using camera intrinsics and Behavior Trees for deterministic pick-and-place execution.",
+  //   summaryPoints: [
+  //     "Controlled simulated SO-ARM in Isaac Sim with MoveIt 2 running inside a Docker container.",
+  //     "Employed classical CV and camera intrinsics with Behavior Trees for deterministic pick-and-place grasping."
+  //   ],
+  //   fullDetails: [
+  //     "Controlled a SO-ARM manipulator simulated in Isaac Sim to execute pick-and-place tasks using MoveIt 2 motion planning.",
+  //     "Containerized the ROS 2 and MoveIt 2 planning stack inside Docker for reproducible simulation execution.",
+  //     "Estimated precise 3D object grasping poses using classical computer vision pipelines and calibrated camera intrinsics.",
+  //     "Architected high-level task execution with ROS 2 Node Lifecycles and Behavior Trees to ensure deterministic, fault-tolerant state transitions."
+  //   ],
+  //   metrics: "Deterministic Behavior Tree State Execution",
+  //   githubUrl: "https://github.com/siddartha00/so-arm-ros2-moveit2",
+  //   image: "https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=800&q=80",
+  //   tags: ["ROS 2", "MoveIt 2", "Isaac Sim", "Docker", "Behavior Trees", "Computer Vision", "C++"]
+  // },
   {
     id: "autonomous-slam-frontier-nav2",
     title: "Autonomous Frontier Exploration & SLAM with Nav2",
