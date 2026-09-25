@@ -28,6 +28,7 @@ export interface Project {
   metrics?: string;
   role?: string[];
   githubUrl: string;
+  youtubeUrl: string;
   image?: string;
   tags: string[];
 }
@@ -37,6 +38,8 @@ export interface Achievement {
   description: string;
   date: string;
   link?: string;
+  youtube: string;
+  image: string;
 }
 
 interface PortfolioProps {
@@ -566,6 +569,7 @@ const mockProjects: Project[] = [
     ],
     metrics: "90% Stable Gait Success Rate across 6 Terrains",
     githubUrl: "https://github.com/siddartha00/go2_blindWalk",
+    youtubeUrl: "https://youtu.be/WDvUrUKvsgQ",
     image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=800&q=80",
     tags: ["Isaac Lab", "Unitree Go2", "PPO", "Reinforcement Learning", "Isaac Sim", "Python"]
   },
@@ -607,14 +611,17 @@ const mockProjects: Project[] = [
       "Achieved a low algorithm failure rate of <5% from slippage during complex exploration runs."
     ],
     metrics: "<5% Slippage Failure Rate",
-    githubUrl: "https://github.com/siddartha00/frontier-nav2-slam",
+    githubUrl: "https://github.com/siddartha00/AutoNavData",
+    youtubeUrl:"",
     image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80",
     tags: ["ROS 2", "Nav2", "SLAM", "OpenCV", "Gazebo", "Autonomous Navigation", "Python"]
   },
+  
+  // --- Group Projects ---
   {
     id: "ur10-realworld-sorting-servoing",
     title: "Real-World UR10 Sorting & Visual Servoing",
-    category: "Solo",
+    category: "Group",
     subtitle: "Industrial manipulator vision-guided sorting with Intel RealSense",
     overview: "Physical sorting workcell programmed on a UR10 industrial manipulator utilizing Intel RealSense 3D camera intrinsics and contour detection for real-time visual servoing.",
     summaryPoints: [
@@ -627,13 +634,15 @@ const mockProjects: Project[] = [
       "Applied classical computer vision contour analysis to compute object area, centroid, and bounding orientation in real-time.",
       "Implemented closed-loop visual servoing to dynamically align the gripper with object orientation, achieving <2% sorting failure rate."
     ],
+    role: [
+      ""
+    ],
     metrics: "<2% Sorting Failure Rate in Physical Tests",
-    githubUrl: "https://github.com/siddartha00/ur10-realworld-sorting",
-    image: "https://images.unsplash.com/photo-1563986768609-322da13575f3?auto=format&fit=crop&w=800&q=80",
+    githubUrl: "",
+    youtubeUrl:"https://youtu.be/X9wfPik49sg",
+    image: "",
     tags: ["UR10", "Intel RealSense", "Visual Servoing", "OpenCV", "Robotics", "Python"]
   },
-
-  // --- Group Projects ---
   {
     id: "hrl-spot-navigation-door-manipulation",
     title: "Hierarchical RL Navigation & Door Manipulation on Spot",
@@ -655,7 +664,8 @@ const mockProjects: Project[] = [
       "Built the computer vision model that detects real-world door coordinates and door handle 3D orientation for navigation and grasping."
     ],
     metrics: "60% End-to-End Clearance Success Rate",
-    githubUrl: "https://github.com/siddartha00/spot-hrl-door-navigation",
+    githubUrl: "https://github.com/siddartha00/rlProjectBDSpot.git",
+    youtubeUrl: "",
     image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80",
     tags: ["Boston Dynamics Spot", "HRL", "SAC", "YOLO11", "PCA", "RGB-D Vision", "PyTorch"]
   },
@@ -680,7 +690,8 @@ const mockProjects: Project[] = [
       "Implemented Node-RED and Modbus communication layer for real-time synchronization between the robotic arms and mobile robot."
     ],
     metrics: "1mm Precision Multi-Robot Synchronization",
-    githubUrl: "https://github.com/siddartha00/multi-robot-coordination-cell",
+    youtubeUrl: "https://youtu.be/FOkDF0Ck3DE",
+    githubUrl: "",
     image: "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?auto=format&fit=crop&w=800&q=80",
     tags: ["Techman TM12", "Fetch AMR", "Node-RED", "Modbus", "FetchCore", "Industrial Automation"]
   }
@@ -691,7 +702,9 @@ const mockAchievements: Achievement[] = [
     title: "1st Place: Ford Robotic Gripper Challenge @ StarkHacks",
     description: "Project: Multimodal Compliant Gripper with Force Feedback. Organized by Humanoid Research Organization at Purdue University. Sponsored by AMD, Ford, Espressif, Qualcomm, MLH, and Ultimaker.",
     date: "April 17-19, 2026",
-    link: "https://devpost.com/software/multimodal-compliant-gripper-with-force-feedback"
+    link: "https://devpost.com/software/multimodal-compliant-gripper-with-force-feedback",
+    youtube: "https://youtu.be/Yh4Lk9BP-3s?si=03OGHrp1SApgz0MC",
+    image: "",
   }
 ];
 
