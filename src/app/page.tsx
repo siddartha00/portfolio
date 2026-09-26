@@ -835,7 +835,9 @@ const mockProjects: Project[] = [
       "Implemented closed-loop visual servoing to dynamically align the gripper with object orientation, achieving <2% sorting failure rate."
     ],
     role: [
-      ""
+      "Implemented a computer-vision pipeline to detect using contours and group them based on the area.",
+      "Programmed an algorithm for real world co-ordinates of the objects using realsense intrinsic and extrinsic co-ordinates.",
+      "Applied tranformation matrices to get the object co-ordinates with respect to the robot base for picking up the object."
     ],
     metrics: "<2% Sorting Failure Rate in Physical Tests",
     githubUrl: "",
