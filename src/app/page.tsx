@@ -2,6 +2,14 @@
 
 import React, { useState, useEffect, useRef } from 'react';
 import profilePic from '../img/zero_bg.png';
+import go2Media from '../media_sources/rl-blind-go2/artifact_go2.gif';
+import nav2Media from '../media_sources/nav2-auto-nav/path-planning-cover.png';
+import ur10Media from '../media_sources/hrl-bd-spot/image1.png';
+import spotMedia from '../media_sources/hrl-bd-spot/image27.png';
+import multiRobotMedia from '../media_sources/hrl-bd-spot/image2.png';
+import depthCover from '../media_sources/rgb-depth/depth-cover.png';
+import depthInput from '../media_sources/rgb-depth/orig-_in.png';
+import depthOutput from '../media_sources/rgb-depth/depth_out.png';
 import {
   LuExternalLink as ExternalLinkIcon,
   LuMail as Mail,
@@ -14,6 +22,10 @@ import {
   LuUser as UserIcon,
   LuUsers as UsersIcon,
   LuMaximize2 as MaximizeIcon,
+  LuPlay as PlayIcon,
+  LuBriefcaseBusiness as BriefcaseIcon,
+  LuGraduationCap as GraduationCapIcon,
+  LuDownload as DownloadIcon,
 } from 'react-icons/lu';
 
 // TypeScript interfaces for project data and props
@@ -31,6 +43,12 @@ export interface Project {
   youtubeUrl: string;
   image?: string;
   tags: string[];
+  mediaFolder?: string;
+  detailImages?: {
+    src: string;
+    alt: string;
+    caption: string;
+  }[];
 }
 
 export interface Achievement {
@@ -54,6 +72,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ projects, achievements }) => {
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [projectFilter, setProjectFilter] = useState<'All' | 'Solo' | 'Group'>('All');
   const navRef = useRef<HTMLDivElement>(null);
+  const navSelectionLock = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const navItems = [
     { name: 'Home', href: '#hero' },
@@ -64,6 +83,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ projects, achievements }) => {
 
   useEffect(() => {
     const handleScroll = () => {
+      if (navSelectionLock.current) return;
       let currentActive = navItems[0].href;
       for (const item of navItems) {
         const section = document.querySelector(item.href) as HTMLElement;
@@ -81,8 +101,20 @@ const Portfolio: React.FC<PortfolioProps> = ({ projects, achievements }) => {
     // Set initial active tab on mount
     handleScroll();
 
+    const releaseNavSelectionLock = () => {
+      if (navSelectionLock.current) {
+        clearTimeout(navSelectionLock.current);
+        navSelectionLock.current = null;
+        handleScroll();
+      }
+    };
+
     window.addEventListener('scroll', handleScroll);
-    return () => window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('scrollend', releaseNavSelectionLock);
+    return () => {
+      window.removeEventListener('scroll', handleScroll);
+      window.removeEventListener('scrollend', releaseNavSelectionLock);
+    };
   }, []);
 
   useEffect(() => {
@@ -125,6 +157,12 @@ const Portfolio: React.FC<PortfolioProps> = ({ projects, achievements }) => {
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
     setActiveTab(href);
+    if (navSelectionLock.current) clearTimeout(navSelectionLock.current);
+    // Keep the clicked item active through the smooth-scroll transition so the
+    // indicator does not briefly jump through intermediate sections.
+    navSelectionLock.current = setTimeout(() => {
+      navSelectionLock.current = null;
+    }, 2500);
     document.querySelector(href)?.scrollIntoView({ behavior: 'smooth' });
   };
 
@@ -148,6 +186,30 @@ const Portfolio: React.FC<PortfolioProps> = ({ projects, achievements }) => {
     if (projectFilter === 'All') return true;
     return p.category === projectFilter;
   });
+  const projectCounts = {
+    All: projects.length,
+    Solo: projects.filter((project) => project.category === 'Solo').length,
+    Group: projects.filter((project) => project.category === 'Group').length,
+  };
+
+  const getYoutubeEmbedUrl = (url: string) => {
+    if (!url) return null;
+    try {
+      const parsedUrl = new URL(url);
+      const videoId = parsedUrl.hostname.includes('youtu.be')
+        ? parsedUrl.pathname.slice(1)
+        : parsedUrl.searchParams.get('v') ?? parsedUrl.pathname.split('/').pop();
+      return videoId ? `https://www.youtube-nocookie.com/embed/${videoId}?rel=0` : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const getYoutubeThumbnailUrl = (url: string) => {
+    const embedUrl = getYoutubeEmbedUrl(url);
+    const videoId = embedUrl?.split('/embed/')[1]?.split('?')[0];
+    return videoId ? `https://i.ytimg.com/vi/${videoId}/hqdefault.jpg` : null;
+  };
 
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center font-sans text-slate-200">
@@ -177,13 +239,31 @@ const Portfolio: React.FC<PortfolioProps> = ({ projects, achievements }) => {
       {/* Main Content Container */}
       <main className="w-full max-w-5xl flex flex-col gap-12 relative z-10 px-6 pt-24 pb-12">
         {/* Hero Section */}
-        <section id="hero" className="flex flex-col items-center justify-center w-full min-h-[70vh] relative pt-10">
+        <section id="hero" className="flex flex-col items-center justify-center w-full min-h-[70vh] relative overflow-hidden rounded-3xl border border-emerald-300/10 bg-[radial-gradient(circle_at_50%_0%,rgba(45,212,191,0.16),transparent_48%),linear-gradient(135deg,rgba(30,41,59,0.9),rgba(2,6,23,0.88)_55%,rgba(6,78,59,0.3))] pt-10">
           <img src={profilePic.src} alt="Profile Photo" className="max-h-48 rounded-full mb-8" />
           <div className="text-center">
-            <h1 className="text-5xl font-bold tracking-tight text-white mb-4">Sai Siddartha, Alleni <br/> Robotics & Software Engineer </h1>
-            <p className="text-lg text-emerald-300 max-w-md mx-auto">MS in Robotics at Purdue University | Ex-Visteon | Specializing in Autonomous Systems, Computer Vision, and Embedded Software. </p>
+            <h1 className="text-5xl font-bold tracking-tight text-white">Sai Siddartha Alleni</h1>
+            <p className="mt-3 text-xl font-medium text-emerald-300">Robotics Software Engineer</p>
+            <p className="mt-3 text-base text-slate-300 max-w-2xl mx-auto">M.Eng. in Robotics from Purdue University, building reliable, learning-enabled autonomous systems.</p>
+            <div className="mt-6 flex flex-wrap justify-center gap-2">
+              {['Reinforcement Learning', 'Robot Perception', 'Autonomous Navigation'].map((specialty) => (
+                <span key={specialty} className="rounded-full border border-emerald-300/25 bg-slate-950/40 px-3 py-1 text-[11px] font-mono tracking-wide text-emerald-200">
+                  {specialty}
+                </span>
+              ))}
+            </div>
           </div>
-          <footer className="flex justify-center w-full mt-12">
+          <div className="mt-8 flex flex-wrap justify-center gap-3">
+            <a href="/Sai-Siddartha-Alleni-Resume.pdf" download className="inline-flex items-center gap-2 rounded-xl bg-[#00ffd0] px-4 py-2.5 text-sm font-semibold text-slate-950 transition-transform hover:-translate-y-0.5 hover:bg-emerald-200 focus:outline-none focus:ring-2 focus:ring-[#00ffd0] focus:ring-offset-2 focus:ring-offset-slate-950">
+              <DownloadIcon className="h-4 w-4" />
+              Download résumé
+            </a>
+            <a href="mailto:allenisaisiddartha@gmail.com" className="inline-flex items-center gap-2 rounded-xl border border-emerald-300/40 bg-slate-950/40 px-4 py-2.5 text-sm font-semibold text-emerald-100 transition-colors hover:border-[#00ffd0] hover:text-[#00ffd0] focus:outline-none focus:ring-2 focus:ring-[#00ffd0] focus:ring-offset-2 focus:ring-offset-slate-950">
+              <Mail className="h-4 w-4" />
+              Contact me
+            </a>
+          </div>
+          <footer className="flex justify-center w-full mt-7">
             <div className="flex flex-row gap-6">
               <a href="https://www.linkedin.com/in/sai-siddartha-alleni" target="_blank" rel="noopener noreferrer" className="text-emerald-500 hover:text-emerald-400 scale-125 transition-transform hover:scale-150">
                 <Linkedin />
@@ -203,8 +283,40 @@ const Portfolio: React.FC<PortfolioProps> = ({ projects, achievements }) => {
           <h2 className="text-3xl font-bold text-white mb-2 text-center md:text-left">About Me</h2>
           <div className="bg-slate-900/50 backdrop-blur-sm p-8 rounded-xl border border-slate-800/50 w-full">
             <p className="text-slate-400 leading-relaxed text-lg">
-             I bridge the gap between low-level embedded systems and high-level autonomous intelligence. With a foundation in automotive software engineering at Visteon and a Master’s in Robotics from Purdue, I specialize in making robots perceive, reason, and move in complex environments. From winning the Ford Robotics Gripper Challenge to training quadrupedal gaits in NVIDIA Isaac Lab, I thrive on solving the "sim-to-real" challenge. My toolkit spans ROS2, Deep Reinforcement Learning, and Real-Time Systems (RTOS), driven by a mission to build the next generation of reliable, autonomous machines.
+             Robotics Software Engineer with an M.Eng. in Robotics from Purdue University, specializing in reinforcement learning for legged locomotion, robot perception, and autonomous navigation. I train parallelized policies in Isaac Lab and PyTorch, build ROS 2 navigation systems, and design dependable coordination layers for real-world robots. My work focuses on sim-to-real transfer, computer vision, and robot learning.
             </p>
+          </div>
+        </section>
+
+        {/* Experience & Education */}
+        <section className="flex flex-col gap-6 py-20 min-h-[50vh] justify-center">
+          <div className="flex items-center gap-3">
+            <BriefcaseIcon className="h-6 w-6 text-[#00ffd0]" />
+            <h2 className="text-3xl font-bold text-white">Experience & Education</h2>
+          </div>
+          <div className="grid gap-5 md:grid-cols-2">
+            <article className="rounded-xl border border-slate-800/70 bg-slate-900/50 p-6 backdrop-blur-sm">
+              <p className="font-mono text-xs uppercase tracking-widest text-[#00ffd0]">Experience</p>
+              <div className="mt-5 border-l border-emerald-500/30 pl-5">
+                <h3 className="text-lg font-bold text-white">Visteon Corporation</h3>
+                <p className="mt-1 text-sm text-emerald-300">Software Engineer · Jul 2023 – Jul 2024</p>
+                <p className="mt-3 text-sm leading-relaxed text-slate-400">Built tooling used by five teams, maintained QNX automotive middleware CI/CD, recovered 3% CPU utilization, and validated DDS communication with automated testing.</p>
+                <p className="mt-4 text-sm text-slate-300">Software Engineering Intern · Jan 2023 – Jun 2023</p>
+                <p className="mt-1 text-sm leading-relaxed text-slate-400">Developed 11 Clang-Tidy safety checks and a CMake-integrated static-analysis workflow for QNX firmware.</p>
+              </div>
+            </article>
+            <article className="rounded-xl border border-slate-800/70 bg-slate-900/50 p-6 backdrop-blur-sm">
+              <div className="flex items-center gap-2">
+                <GraduationCapIcon className="h-5 w-5 text-[#00ffd0]" />
+                <p className="font-mono text-xs uppercase tracking-widest text-[#00ffd0]">Education</p>
+              </div>
+              <div className="mt-5 border-l border-emerald-500/30 pl-5">
+                <h3 className="text-lg font-bold text-white">Purdue University</h3>
+                <p className="mt-1 text-sm text-emerald-300">Master of Engineering in Robotics · Jul 2024 – May 2026</p>
+                <p className="mt-4 text-sm font-medium text-slate-300">Vellore Institute of Technology</p>
+                <p className="mt-1 text-sm leading-relaxed text-slate-400">Bachelor of Technology in Electronics and Communication · Jul 2019 – Jun 2023</p>
+              </div>
+            </article>
           </div>
         </section>
 
@@ -217,30 +329,38 @@ const Portfolio: React.FC<PortfolioProps> = ({ projects, achievements }) => {
               style={{ transform: `translateX(-${currentAchievementIndex * 100}%)` }}
             >
               {achievements.map((achievement, index) => {
-                const CardWrapper = achievement.link ? 'a' : 'div';
-                const wrapperProps = achievement.link ? { 
-                  href: achievement.link, 
-                  target: "_blank", 
-                  rel: "noopener noreferrer",
-                  className: "flex flex-col items-center text-center group cursor-pointer block w-full h-full" 
-                } : {
-                  className: "flex flex-col items-center text-center"
-                };
-
+                const achievementVideo = getYoutubeEmbedUrl(achievement.youtube);
                 return (
                   <div key={index} className="w-full flex-shrink-0 p-8 md:p-12">
-                    <CardWrapper {...wrapperProps as any}>
+                    <div className="flex flex-col items-center text-center group">
+                      {(achievementVideo || achievement.image) && (
+                        <div className="mb-6 aspect-video w-full max-w-3xl overflow-hidden rounded-xl border border-slate-700/80 bg-slate-950 shadow-lg">
+                          {achievementVideo ? (
+                            <iframe
+                              src={achievementVideo}
+                              title={`${achievement.title} video`}
+                              className="h-full w-full"
+                              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                              allowFullScreen
+                            />
+                          ) : (
+                            <img src={achievement.image} alt={achievement.title} className="h-full w-full object-cover" />
+                          )}
+                        </div>
+                      )}
                       <span className="text-[#00ffd0] font-mono text-sm mb-4 bg-[#00ffd0]/10 px-4 py-1 rounded-full">{achievement.date}</span>
-                      <h3 className="text-2xl font-bold text-white mb-4 flex items-center gap-2 group-hover:text-[#00ffd0] transition-colors duration-300">
-                        {achievement.title}
-                        {achievement.link && (
-                          <ExternalLinkIcon className="w-6 h-6 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                        )}
-                      </h3>
+                      {achievement.link ? (
+                        <a href={achievement.link} target="_blank" rel="noopener noreferrer" className="text-2xl font-bold text-white mb-4 flex items-center gap-2 hover:text-[#00ffd0] transition-colors duration-300">
+                          {achievement.title}
+                          <ExternalLinkIcon className="w-6 h-6" />
+                        </a>
+                      ) : (
+                        <h3 className="text-2xl font-bold text-white mb-4">{achievement.title}</h3>
+                      )}
                       <p className="text-slate-400 leading-relaxed text-lg max-w-3xl group-hover:text-slate-300 transition-colors duration-300">
                         {achievement.description}
                       </p>
-                    </CardWrapper>
+                    </div>
                   </div>
                 );
               })}
@@ -298,7 +418,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ projects, achievements }) => {
                       : 'text-slate-400 hover:text-slate-200 hover:bg-slate-800/50'
                   }`}
                 >
-                  {filter === 'All' ? 'All (6)' : filter === 'Solo' ? 'Solo (4)' : 'Group (2)'}
+                  {filter} ({projectCounts[filter]})
                 </button>
               ))}
             </div>
@@ -315,8 +435,15 @@ const Portfolio: React.FC<PortfolioProps> = ({ projects, achievements }) => {
                 <div className="absolute inset-0 bg-gradient-to-r from-emerald-500/[0.03] to-[#00ffd0]/[0.03] opacity-0 group-hover:opacity-100 transition-opacity duration-300 pointer-events-none" />
 
                 {/* Left Side: Compact Project Photo / Preview */}
-                <div className="relative w-full sm:w-44 md:w-52 h-36 sm:h-auto min-h-[140px] md:min-h-[150px] bg-slate-950/80 shrink-0 overflow-hidden flex items-center justify-center border-b sm:border-b-0 sm:border-r border-slate-800/60">
-                  {project.image ? (
+                <div className="relative w-full sm:w-56 md:w-64 aspect-video sm:aspect-auto sm:h-auto min-h-[140px] md:min-h-[150px] bg-slate-950/80 shrink-0 overflow-hidden flex items-center justify-center border-b sm:border-b-0 sm:border-r border-slate-800/60">
+                  {getYoutubeThumbnailUrl(project.youtubeUrl) ? (
+                    <>
+                      <img src={getYoutubeThumbnailUrl(project.youtubeUrl)!} alt={`${project.title} video preview`} className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                      <div className="absolute inset-0 flex items-center justify-center bg-slate-950/25 transition-colors group-hover:bg-slate-950/10">
+                        <span className="flex h-11 w-11 items-center justify-center rounded-full border border-white/40 bg-slate-950/75 text-[#00ffd0] shadow-lg"><PlayIcon className="ml-0.5 h-5 w-5" /></span>
+                      </div>
+                    </>
+                  ) : project.image ? (
                     <img
                       src={project.image}
                       alt={project.title}
@@ -367,6 +494,13 @@ const Portfolio: React.FC<PortfolioProps> = ({ projects, achievements }) => {
                       <span>{project.title}</span>
                     </h3>
 
+                    {project.metrics && (
+                      <div className="mb-3 inline-flex max-w-full items-center gap-2 rounded-lg border border-emerald-500/20 bg-slate-950/50 px-2.5 py-1 text-xs">
+                        <span className="font-mono uppercase tracking-wide text-slate-500">Outcome</span>
+                        <span className="truncate font-mono font-semibold text-[#00ffd0]">{project.metrics}</span>
+                      </div>
+                    )}
+
                     {/* Compact 2-bullet Overview */}
                     <ul className="space-y-1.5 text-slate-300/85 text-xs md:text-sm leading-relaxed">
                       {project.summaryPoints.map((point, pointIdx) => (
@@ -378,7 +512,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ projects, achievements }) => {
                     </ul>
                   </div>
 
-                  {/* Bottom Bar: Island Modal Trigger + GitHub Link */}
+                  {/* Bottom Bar: Island Modal Trigger + Available External Links */}
                   <div className="flex items-center justify-between pt-3 mt-3 border-t border-slate-800/60">
                     <button
                       type="button"
@@ -388,19 +522,21 @@ const Portfolio: React.FC<PortfolioProps> = ({ projects, achievements }) => {
                       <span>Full Details & Architecture</span>
                     </button>
 
-                    {/* GitHub Link: Prevent tile modal click */}
-                    <a
-                      href={project.githubUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      onClick={(e) => e.stopPropagation()}
-                      className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/60 hover:border-[#00ffd0]/50 text-xs font-medium transition-all duration-200 group/btn"
-                      aria-label={`GitHub repository for ${project.title}`}
-                    >
-                      <GithubIcon className="w-3.5 h-3.5 text-emerald-400 group-hover/btn:text-[#00ffd0] transition-colors" />
-                      <span>GitHub</span>
-                      <ExternalLinkIcon className="w-3 h-3 opacity-60 group-hover/btn:opacity-100 group-hover/btn:translate-x-0.5 transition-all" />
-                    </a>
+                    <div className="flex items-center gap-2">
+                      {project.githubUrl && (
+                        <a href={project.githubUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/60 hover:border-[#00ffd0]/50 text-xs font-medium transition-all duration-200 group/btn" aria-label={`GitHub repository for ${project.title}`}>
+                          <GithubIcon className="w-3.5 h-3.5 text-emerald-400 group-hover/btn:text-[#00ffd0] transition-colors" />
+                          <span>GitHub</span>
+                          <ExternalLinkIcon className="w-3 h-3 opacity-60 group-hover/btn:opacity-100 group-hover/btn:translate-x-0.5 transition-all" />
+                        </a>
+                      )}
+                      {project.youtubeUrl && (
+                        <a href={project.youtubeUrl} target="_blank" rel="noopener noreferrer" onClick={(e) => e.stopPropagation()} className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/60 hover:border-red-400/60 text-xs font-medium transition-all duration-200" aria-label={`YouTube video for ${project.title}`}>
+                          <span>Video</span>
+                          <ExternalLinkIcon className="w-3 h-3 opacity-60" />
+                        </a>
+                      )}
+                    </div>
                   </div>
                 </div>
               </div>
@@ -421,9 +557,11 @@ const Portfolio: React.FC<PortfolioProps> = ({ projects, achievements }) => {
         >
           {/* Island Modal Card */}
           <div
-            className="relative w-full max-w-2xl max-h-[88vh] bg-slate-900/95 border border-slate-700/90 rounded-2xl p-6 md:p-8 overflow-y-auto shadow-2xl shadow-cyan-950/40 flex flex-col gap-6 text-slate-200 transition-all duration-300"
+            className="relative w-full max-w-3xl max-h-[88vh] overflow-hidden bg-slate-900/95 border border-slate-700/90 rounded-2xl p-6 md:p-8 shadow-2xl shadow-cyan-950/40 text-slate-200 transition-all duration-300"
             onClick={(e) => e.stopPropagation()}
           >
+            <div className="custom-scrollbar -mr-3 max-h-[calc(88vh-3rem)] overflow-y-auto pr-3 md:-mr-4 md:max-h-[calc(88vh-4rem)] md:pr-4">
+              <div className="flex flex-col gap-6">
             {/* Header: Type Badge, Institution & Close Button */}
             <div className="flex items-start justify-between gap-4">
               <div className="flex flex-col gap-1">
@@ -481,6 +619,33 @@ const Portfolio: React.FC<PortfolioProps> = ({ projects, achievements }) => {
               ))}
             </div>
 
+            {/* Project Video */}
+            {getYoutubeEmbedUrl(selectedProject.youtubeUrl) && (
+              <div className="aspect-video w-full overflow-hidden rounded-xl border border-slate-700/80 bg-slate-950 shadow-lg">
+                <iframe
+                  src={getYoutubeEmbedUrl(selectedProject.youtubeUrl)!}
+                  title={`${selectedProject.title} video`}
+                  className="h-full w-full"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                />
+              </div>
+            )}
+
+            {selectedProject.detailImages && selectedProject.detailImages.length > 0 && (
+              <div>
+                <h4 className="text-xs uppercase tracking-widest font-mono text-slate-400 mb-3">Input & Predicted Output</h4>
+                <div className="grid gap-3 sm:grid-cols-2">
+                  {selectedProject.detailImages.map((image) => (
+                    <figure key={image.alt} className="overflow-hidden rounded-xl border border-slate-700/80 bg-slate-950/70">
+                      <img src={image.src} alt={image.alt} className="aspect-video w-full object-cover" />
+                      <figcaption className="border-t border-slate-800 px-3 py-2 text-xs text-slate-400">{image.caption}</figcaption>
+                    </figure>
+                  ))}
+                </div>
+              </div>
+            )}
+
             {/* Project Overview */}
             <div className="bg-slate-950/50 p-4 rounded-xl border border-slate-800/60">
               <h4 className="text-xs uppercase tracking-widest font-mono text-slate-400 mb-2">Project Overview</h4>
@@ -519,16 +684,21 @@ const Portfolio: React.FC<PortfolioProps> = ({ projects, achievements }) => {
 
             {/* Footer Actions */}
             <div className="flex items-center justify-between pt-4 border-t border-slate-800 mt-2">
-              <a
-                href={selectedProject.githubUrl}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 hover:border-[#00ffd0]/50 hover:shadow-[0_0_15px_rgba(0,255,208,0.2)] text-sm font-medium transition-all"
-              >
-                <GithubIcon className="w-4 h-4 text-[#00ffd0]" />
-                <span>View on GitHub</span>
-                <ExternalLinkIcon className="w-4 h-4 opacity-70" />
-              </a>
+              <div className="flex flex-wrap gap-2">
+                {selectedProject.githubUrl && (
+                  <a href={selectedProject.githubUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 hover:border-[#00ffd0]/50 hover:shadow-[0_0_15px_rgba(0,255,208,0.2)] text-sm font-medium transition-all">
+                    <GithubIcon className="w-4 h-4 text-[#00ffd0]" />
+                    <span>View on GitHub</span>
+                    <ExternalLinkIcon className="w-4 h-4 opacity-70" />
+                  </a>
+                )}
+                {selectedProject.youtubeUrl && (
+                  <a href={selectedProject.youtubeUrl} target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white border border-slate-700 hover:border-red-400/60 text-sm font-medium transition-all">
+                    <span>Watch video</span>
+                    <ExternalLinkIcon className="w-4 h-4 opacity-70" />
+                  </a>
+                )}
+              </div>
 
               <button
                 type="button"
@@ -537,6 +707,8 @@ const Portfolio: React.FC<PortfolioProps> = ({ projects, achievements }) => {
               >
                 Close
               </button>
+            </div>
+              </div>
             </div>
           </div>
         </div>
@@ -555,22 +727,22 @@ const mockProjects: Project[] = [
     title: "Quadruped Blind Locomotion via Asymmetric Actor-Critic",
     category: "Solo",
     subtitle: "Proprioceptive terrain walking on Unitree Go2 with NVIDIA Isaac Lab",
-    overview: "Trained a Unitree Go2 quadruped robot to traverse challenging and uneven terrains using purely proprioceptive feedback through Asymmetric Actor-Critic reinforcement learning in Isaac Sim.",
+    overview: "Trained an asymmetric actor-critic PPO policy for Unitree Go2 blind locomotion across seven terrain types in GPU-parallel Isaac Lab simulation.",
     summaryPoints: [
-      "Trained Unitree Go2 across 6 diverse terrains (stairs, uneven ground, random grids) using Isaac Sim proprioception.",
-      "Achieved 90% stable gait success rate across all terrains leveraging 2,000 parallel environments in Isaac Lab."
+      "Trained across 2,000 parallel environments for blind locomotion over seven terrain types.",
+      "Reached 90% velocity-tracking accuracy while reducing command error to ±0.1 m/s."
     ],
     fullDetails: [
-      "Trained a Unitree Go2 quadruped on multiple challenging terrains to walk using purely proprioceptive feedback in Isaac Sim.",
-      "Engineered a training pipeline spanning six distinct terrain topologies, including stairs, uneven slopes, and randomized height grids.",
-      "Scaled training throughput by simulating 2,000 parallel environments simultaneously using Isaac Lab's GPU-accelerated architecture.",
-      "Designed a custom ray-caster sensor reward function that penalizes deviation from target ground clearance, maintaining consistent body height.",
-      "Achieved a 90% stable gait success rate across all evaluated terrain types."
+      "Trained an asymmetric actor-critic PPO policy across 2,000 parallel Isaac Lab environments for blind locomotion on seven terrain types.",
+      "Designed a LiDAR-based observation space with proprioceptive state history, reducing velocity command error to ±0.1 m/s across randomized friction and motor dynamics.",
+      "Applied domain randomization across terrain geometry, body mass, and joint damping to improve physical-transfer generalization.",
+      "Optimized GPU-parallel simulation to achieve 3× faster iteration cycles than single-environment baselines."
     ],
-    metrics: "90% Stable Gait Success Rate across 6 Terrains",
+    metrics: "90% Velocity Tracking across 7 Terrains",
     githubUrl: "https://github.com/siddartha00/go2_blindWalk",
     youtubeUrl: "https://youtu.be/WDvUrUKvsgQ",
-    image: "https://images.unsplash.com/photo-1485827404703-89b55fcc595e?auto=format&fit=crop&w=800&q=80",
+    mediaFolder: "media_sources/rl-blind-go2",
+    image: go2Media.src,
     tags: ["Isaac Lab", "Unitree Go2", "PPO", "Reinforcement Learning", "Isaac Sim", "Python"]
   },
   // {
@@ -599,22 +771,50 @@ const mockProjects: Project[] = [
     title: "Autonomous Frontier Exploration & SLAM with Nav2",
     category: "Solo",
     subtitle: "Occupancy grid frontier exploration and obstacle-aware navigation",
-    overview: "Autonomous mobile robot exploration system that identifies map frontiers on occupancy grids using OpenCV and navigates via Nav2 and SLAM in ROS 2 Gazebo.",
+    overview: "ROS 2 Navigation2 system combining SLAM Toolbox, LiDAR, and Gazebo for real-time mapping, planning, and obstacle avoidance.",
     summaryPoints: [
-      "Autonomous exploration searching for map frontiers on occupancy grids with OpenCV & Nav2.",
-      "Fused bumper collision data into occupancy maps, reducing slippage failure rate to <5%."
+      "Built real-time occupancy-grid mapping and A* path planning with Nav2 and SLAM Toolbox.",
+      "Configured behavior-tree recovery, DWB obstacle avoidance, and EKF sensor fusion."
     ],
     fullDetails: [
-      "Engineered an autonomous exploration framework searching for unmapped frontiers using OpenCV image processing on live occupancy grid maps.",
-      "Integrated Nav2 navigation stack in ROS 2 for dynamic path generation and obstacle avoidance.",
-      "Fused physical bumper collision data directly into occupancy grid obstacle layers to prevent stationary Gazebo docking station collisions.",
-      "Achieved a low algorithm failure rate of <5% from slippage during complex exploration runs."
+      "Developed a full ROS 2 Navigation2 stack with SLAM Toolbox for real-time occupancy-grid mapping and A* path planning.",
+      "Configured a behavior-tree recovery system and DWB local planner for dynamic obstacle avoidance at 200 Hz.",
+      "Integrated LiDAR scan matching with EKF sensor fusion for reliable localization in feature-sparse environments."
     ],
-    metrics: "<5% Slippage Failure Rate",
+    metrics: "200 Hz Dynamic Obstacle Avoidance",
     githubUrl: "https://github.com/siddartha00/AutoNavData",
     youtubeUrl:"",
-    image: "https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80",
+    mediaFolder: "media_sources/nav2-auto_nav",
+    image: nav2Media.src,
     tags: ["ROS 2", "Nav2", "SLAM", "OpenCV", "Gazebo", "Autonomous Navigation", "Python"]
+  },
+  {
+    id: "depth-estimation-vision-transformers",
+    title: "Marigold Depth Replica: Relative-Depth Estimation",
+    category: "Solo",
+    subtitle: "PyTorch Lightning implementation adapting Stable Diffusion 2 for monocular relative depth",
+    overview: "Research implementation of diffusion-based monocular relative-depth estimation inspired by Marigold. The pipeline adapts the Stable Diffusion 2 latent-diffusion backbone to predict relative scene depth from a single RGB image.",
+    summaryPoints: [
+      "Adapted a Stable Diffusion 2 U-Net from 4 to 8 input channels for depth-conditioned denoising.",
+      "Used DDIM inference to decode a single-channel relative-depth map from an RGB image."
+    ],
+    fullDetails: [
+      "Reused pretrained Stable Diffusion 2 components: a frozen VAE encodes both RGB images and normalized relative-depth targets into latent tensors.",
+      "Concatenated the noisy depth latent with the image latent to create an 8-channel input for a modified U-Net, initialized from the original Stable Diffusion input weights.",
+      "Trained the depth-conditioned denoiser to predict injected Gaussian noise using mean-squared error.",
+      "Ran DDIM inference to iteratively denoise a random depth latent, then decoded it into a single-channel relative-depth visualization.",
+      "Prepared Virtual KITTI-style RGB/depth pairs at 512 × 512 with percentile-normalized depth targets; outputs represent relative scene structure, not calibrated metric distance."
+    ],
+    metrics: "8-Channel U-Net + DDIM Relative-Depth Inference",
+    githubUrl: "https://github.com/siddartha00/marigoldDepthReplica.git",
+    mediaFolder: "media_sources/rgb-depth",
+    youtubeUrl: "",
+    image: depthCover.src,
+    detailImages: [
+      { src: depthInput.src, alt: "Foggy driving scene RGB input", caption: "RGB input image" },
+      { src: depthOutput.src, alt: "Predicted relative-depth map for the driving scene", caption: "Predicted relative depth" }
+    ],
+    tags: ["PyTorch Lightning", "Stable Diffusion 2", "DDIM", "Virtual KITTI 2", "Monocular Depth"]
   },
   
   // --- Group Projects ---
@@ -640,7 +840,8 @@ const mockProjects: Project[] = [
     metrics: "<2% Sorting Failure Rate in Physical Tests",
     githubUrl: "",
     youtubeUrl:"https://youtu.be/X9wfPik49sg",
-    image: "",
+    image: ur10Media.src,
+    mediaFolder: "",
     tags: ["UR10", "Intel RealSense", "Visual Servoing", "OpenCV", "Robotics", "Python"]
   },
   {
@@ -666,7 +867,8 @@ const mockProjects: Project[] = [
     metrics: "60% End-to-End Clearance Success Rate",
     githubUrl: "https://github.com/siddartha00/rlProjectBDSpot.git",
     youtubeUrl: "",
-    image: "https://images.unsplash.com/photo-1618005182384-a83a8bd57fbe?auto=format&fit=crop&w=800&q=80",
+    mediaFolder: "media_sources/hrl-bd-spot",
+    image: spotMedia.src,
     tags: ["Boston Dynamics Spot", "HRL", "SAC", "YOLO11", "PCA", "RGB-D Vision", "PyTorch"]
   },
   {
@@ -692,7 +894,8 @@ const mockProjects: Project[] = [
     metrics: "1mm Precision Multi-Robot Synchronization",
     youtubeUrl: "https://youtu.be/FOkDF0Ck3DE",
     githubUrl: "",
-    image: "https://images.unsplash.com/photo-1508739773434-c26b3d09e071?auto=format&fit=crop&w=800&q=80",
+    mediaFolder: "",
+    image: multiRobotMedia.src,
     tags: ["Techman TM12", "Fetch AMR", "Node-RED", "Modbus", "FetchCore", "Industrial Automation"]
   }
 ];
@@ -709,8 +912,13 @@ const mockAchievements: Achievement[] = [
 ];
 
 export default function App() {
+  const portfolioProjects = [
+    ...mockProjects.filter((project) => project.id !== "ur10-realworld-sorting-servoing" && project.id !== "multi-robot-industrial-pipeline"),
+    ...mockProjects.filter((project) => project.id === "ur10-realworld-sorting-servoing" || project.id === "multi-robot-industrial-pipeline"),
+  ];
+
   return (
-    <Portfolio projects={mockProjects} achievements={mockAchievements} />
+    <Portfolio projects={portfolioProjects} achievements={mockAchievements} />
   );
 }
 

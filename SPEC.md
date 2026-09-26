@@ -23,18 +23,18 @@ The page is a dark, glassy engineering portfolio. It uses a nearly-black slate c
 
 ### Color system
 
-| Role | Current value / Tailwind token | Use |
-| --- | --- | --- |
-| Page canvas | `slate-950` | Full-page background and dark image fallback areas. |
-| Primary surface | `slate-900/50` | About, achievements, and project card panels. |
-| Elevated surface | `slate-900/95` | Project modal. |
-| Recessed surface | `slate-950/50` to `slate-950/80` | Modal content panels, metrics, empty media preview. |
-| Default body text | `slate-200` / `slate-300` | General readable content. |
-| Muted text | `slate-400` | Supporting copy, labels, and low-priority UI. |
-| Heading text | `white` | Main hierarchy. |
-| Signature accent | `#00ffd0` | Active tab indicator, key metrics, bullets, interactive highlights. |
-| Supporting green | `emerald-300` to `emerald-500` | Intro, icons, badges, tags. |
-| Group-project distinction | `amber-300` / `amber-400` | Group category badges only. |
+| Role                      | Current value / Tailwind token   | Use                                                                 |
+| ------------------------- | -------------------------------- | ------------------------------------------------------------------- |
+| Page canvas               | `slate-950`                      | Full-page background and dark image fallback areas.                 |
+| Primary surface           | `slate-900/50`                   | About, achievements, and project card panels.                       |
+| Elevated surface          | `slate-900/95`                   | Project modal.                                                      |
+| Recessed surface          | `slate-950/50` to `slate-950/80` | Modal content panels, metrics, empty media preview.                 |
+| Default body text         | `slate-200` / `slate-300`        | General readable content.                                           |
+| Muted text                | `slate-400`                      | Supporting copy, labels, and low-priority UI.                       |
+| Heading text              | `white`                          | Main hierarchy.                                                     |
+| Signature accent          | `#00ffd0`                        | Active tab indicator, key metrics, bullets, interactive highlights. |
+| Supporting green          | `emerald-300` to `emerald-500`   | Intro, icons, badges, tags.                                         |
+| Group-project distinction | `amber-300` / `amber-400`        | Group category badges only.                                         |
 
 Use translucent colors with `backdrop-blur` on major panels. Borders are normally `slate-800` at reduced opacity, transitioning to semi-transparent aqua when an interactive project tile is hovered.
 
@@ -126,14 +126,14 @@ Use translucent colors with `backdrop-blur` on major panels. Borders are normall
 
 ## Motion and interaction rules
 
-| Interaction | Required behavior |
-| --- | --- |
-| Navigation | Smooth section scroll; active tab follows section position; indicator transitions for 300 ms. |
-| Social icons | Color lightens and scale increases on hover. |
-| Achievement slide | Horizontal transform animation, 500 ms, ease-in-out; automatic next slide every 5 seconds. |
-| Project card | Border, color, overlay, shadow, and image scale transition over 200–500 ms depending on property. |
-| External links | Open in a new tab with `noopener noreferrer`. |
-| Modal | Blocks document scroll; Escape and backdrop close it; inner scrolling preserves access to all content. |
+| Interaction       | Required behavior                                                                                      |
+| ----------------- | ------------------------------------------------------------------------------------------------------ |
+| Navigation        | Smooth section scroll; active tab follows section position; indicator transitions for 300 ms.          |
+| Social icons      | Color lightens and scale increases on hover.                                                           |
+| Achievement slide | Horizontal transform animation, 500 ms, ease-in-out; automatic next slide every 5 seconds.             |
+| Project card      | Border, color, overlay, shadow, and image scale transition over 200–500 ms depending on property.      |
+| External links    | Open in a new tab with `noopener noreferrer`.                                                          |
+| Modal             | Blocks document scroll; Escape and backdrop close it; inner scrolling preserves access to all content. |
 
 ## Responsive rules
 
@@ -148,17 +148,17 @@ Use translucent colors with `backdrop-blur` on major panels. Borders are normall
 
 Each project is rendered from the `Project` type in `page.tsx`:
 
-| Field | Used in the current UI |
-| --- | --- |
-| `id`, `title`, `category` | Card identity, heading, filtering, category labels. |
-| `subtitle` | Modal only. |
-| `overview`, `summaryPoints`, `fullDetails` | Modal overview, card bullets, and modal technical list. |
-| `metrics` | Optional highlighted modal metric. |
-| `role` | Optional contributions callout. Do not supply an array containing an empty string; omit it when there is no role content. |
-| `githubUrl` | Card and modal GitHub buttons. Empty URLs should not render a link in a future revision. |
-| `youtubeUrl` | Present in data but not currently rendered. |
-| `image` | Card image. Empty value activates the generic preview placeholder. |
-| `tags` | Card shows first three; modal shows all. |
+| Field                                      | Used in the current UI                                                                                                    |
+| ------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------- |
+| `id`, `title`, `category`                  | Card identity, heading, filtering, category labels.                                                                       |
+| `subtitle`                                 | Modal only.                                                                                                               |
+| `overview`, `summaryPoints`, `fullDetails` | Modal overview, card bullets, and modal technical list.                                                                   |
+| `metrics`                                  | Optional highlighted modal metric.                                                                                        |
+| `role`                                     | Optional contributions callout. Do not supply an array containing an empty string; omit it when there is no role content. |
+| `githubUrl`                                | Card and modal GitHub buttons. Empty URLs should not render a link in a future revision.                                  |
+| `youtubeUrl`                               | Present in data but not currently rendered.                                                                               |
+| `image`                                    | Card image. Empty value activates the generic preview placeholder.                                                        |
+| `tags`                                     | Card shows first three; modal shows all.                                                                                  |
 
 ### Achievement fields
 
@@ -182,3 +182,15 @@ When implementing a request based on this document:
 - Preserve the mobile-first card stack and avoid making the 1024 px content column wider without a clear reason.
 - Use real project imagery where available; keep media `object-cover` and provide an informative `alt` value.
 - Treat this file as the design brief. A concise future request such as “update the project cards according to SPEC.md” should be understood as applying these rules to `src/app/page.tsx`.
+
+## TODO
+
+- [x] Improve the fixed navigation animation and keep the clicked item active during smooth scrolling.
+- [x] Add a lighter, profile-compatible gradient treatment to the hero section.
+- [x] Add responsive achievement image/YouTube media above the existing status, title, link, and description.
+- [x] Derive project-filter counts from the project data.
+- [x] Use local project media where available, prioritize YouTube video embeds, and use 16:9 media rails.
+- [x] Show GitHub and video links only when a project supplies them.
+- [x] Widen the project-details panel and add a subtle rounded custom scrollbar.
+- [x] Add the YouTube video, when available, to the project description panel.
+- [x] Inset and shorten the project-description scrollbar so it does not cover the card’s rounded corners.
