@@ -194,3 +194,5 @@ When implementing a request based on this document:
 - [x] Widen the project-details panel and add a subtle rounded custom scrollbar.
 - [x] Add the YouTube video, when available, to the project description panel.
 - [x] Inset and shorten the project-description scrollbar so it does not cover the card’s rounded corners.
+- [x] Create a tagging system with v<Semantic version>+YYYYMMDD as the stable tag, v<Semantic version>-dev<number>+YYYYMMDD for development versions, v<Semantic version>-test+YYYYMMDD for versions that passed all the test cases and create a github action workflow that will only serve the latest stable tag as the webpage.
+- [x] Limit commits that could be served using github pages to tagged stable versions.
