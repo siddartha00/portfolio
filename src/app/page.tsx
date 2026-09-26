@@ -66,6 +66,7 @@ interface PortfolioProps {
 }
 
 const Portfolio: React.FC<PortfolioProps> = ({ projects, achievements }) => {
+  const basePath = process.env.NEXT_PUBLIC_BASE_PATH ?? '';
   const [activeTab, setActiveTab] = useState('#hero');
   const [indicatorStyle, setIndicatorStyle] = useState({ left: 0, width: 0 });
   const [currentAchievementIndex, setCurrentAchievementIndex] = useState(0);
@@ -254,7 +255,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ projects, achievements }) => {
             </div>
           </div>
           <div className="mt-8 flex flex-wrap justify-center gap-3">
-            <a href="/Sai-Siddartha-Alleni-Resume.pdf" download className="inline-flex items-center gap-2 rounded-xl bg-[#00ffd0] px-4 py-2.5 text-sm font-semibold text-slate-950 transition-transform hover:-translate-y-0.5 hover:bg-emerald-200 focus:outline-none focus:ring-2 focus:ring-[#00ffd0] focus:ring-offset-2 focus:ring-offset-slate-950">
+            <a href={`${basePath}/Sai-Siddartha-Alleni-Resume.pdf`} download className="inline-flex items-center gap-2 rounded-xl bg-[#00ffd0] px-4 py-2.5 text-sm font-semibold text-slate-950 transition-transform hover:-translate-y-0.5 hover:bg-emerald-200 focus:outline-none focus:ring-2 focus:ring-[#00ffd0] focus:ring-offset-2 focus:ring-offset-slate-950">
               <DownloadIcon className="h-4 w-4" />
               Download résumé
             </a>
