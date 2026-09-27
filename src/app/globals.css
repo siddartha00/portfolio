@@ -1,5 +1,21 @@
 @import "tailwindcss";
 
+.responsive-hero-height {
+  min-height: 80vh;
+}
+
+@media (min-height: 950px) {
+  .responsive-hero-height {
+    min-height: 70vh;
+  }
+}
+
+@media (min-height: 1250px) {
+  .responsive-hero-height {
+    min-height: 50vh;
+  }
+}
+
 :root {
   --background: #ffffff;
   --foreground: #171717;

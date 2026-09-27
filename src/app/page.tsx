@@ -299,12 +299,12 @@ const Portfolio: React.FC<PortfolioProps> = ({ projects, achievements }) => {
       {/* Main Content Container */}
       <main className="w-full max-w-5xl flex flex-col gap-12 relative z-10 px-6 pt-24 pb-12">
         {/* Hero Section */}
-        <section id="hero" className="flex flex-col items-center justify-center w-full min-h-[70vh] relative overflow-hidden rounded-3xl border border-emerald-300/10 bg-[radial-gradient(circle_at_50%_0%,rgba(45,212,191,0.16),transparent_48%),linear-gradient(135deg,rgba(30,41,59,0.9),rgba(2,6,23,0.88)_55%,rgba(6,78,59,0.3))] pt-10">
+        <section id="hero" className="responsive-hero-height flex flex-col items-center justify-center w-full relative overflow-hidden rounded-3xl border border-emerald-300/10 bg-[radial-gradient(circle_at_50%_0%,rgba(45,212,191,0.16),transparent_48%),linear-gradient(135deg,rgba(30,41,59,0.9),rgba(2,6,23,0.88)_55%,rgba(6,78,59,0.3))] px-4 pt-10 pb-10 sm:px-6 sm:pb-12">
           <img src={profilePic.src} alt="Profile Photo" className="max-h-48 rounded-full mb-8" />
           <div className="text-center">
-            <h1 className="text-5xl font-bold tracking-tight text-white">Sai Siddartha Alleni</h1>
-            <p className="mt-3 text-xl font-medium text-emerald-300">Robotics Software Engineer</p>
-            <p className="mt-3 text-base text-slate-300 max-w-2xl mx-auto">M.Eng. in Robotics from Purdue University, building reliable, learning-enabled autonomous systems.</p>
+            <h1 className="text-[clamp(2rem,8.8vw,2.5rem)] sm:text-5xl font-bold tracking-tight text-white">Sai Siddartha Alleni</h1>
+            <p className="mt-3 text-lg font-medium text-emerald-300 sm:text-xl">Robotics Software Engineer</p>
+            <p className="mt-3 max-w-2xl mx-auto text-sm text-slate-300 sm:text-base">M.Eng. in Robotics from Purdue University, building reliable, learning-enabled autonomous systems.</p>
             <div className="mt-6 flex flex-wrap justify-center gap-2">
               {['Reinforcement Learning', 'Robot Perception', 'Autonomous Navigation'].map((specialty) => (
                 <span key={specialty} className="rounded-full border border-emerald-300/25 bg-slate-950/40 px-3 py-1 text-[11px] font-mono tracking-wide text-emerald-200">
@@ -323,16 +323,19 @@ const Portfolio: React.FC<PortfolioProps> = ({ projects, achievements }) => {
               Contact me
             </a>
           </div>
-          <footer className="flex justify-center w-full mt-7">
-            <div className="flex flex-row gap-6">
-              <a href="https://www.linkedin.com/in/sai-siddartha-alleni" target="_blank" rel="noopener noreferrer" className="text-emerald-500 hover:text-emerald-400 scale-125 transition-transform hover:scale-150">
-                <Linkedin />
+          <footer className="mt-7 flex w-full justify-center">
+            <div className="flex flex-wrap justify-center gap-2 sm:gap-3">
+              <a href="https://www.linkedin.com/in/sai-siddartha-alleni" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-lg border border-emerald-300/25 bg-slate-950/35 px-3 py-2 text-sm font-medium text-emerald-200 transition-colors hover:border-[#00ffd0] hover:text-[#00ffd0] focus:outline-none focus:ring-2 focus:ring-[#00ffd0] focus:ring-offset-2 focus:ring-offset-slate-950">
+                <Linkedin className="h-4 w-4" />
+                LinkedIn
               </a>
-              <a href="https://github.com/siddartha00" target="_blank" rel="noopener noreferrer" className="text-emerald-500 hover:text-emerald-400 scale-125 transition-transform hover:scale-150">
-                <GithubIcon />
+              <a href="https://github.com/siddartha00" target="_blank" rel="noopener noreferrer" className="inline-flex items-center gap-2 rounded-lg border border-emerald-300/25 bg-slate-950/35 px-3 py-2 text-sm font-medium text-emerald-200 transition-colors hover:border-[#00ffd0] hover:text-[#00ffd0] focus:outline-none focus:ring-2 focus:ring-[#00ffd0] focus:ring-offset-2 focus:ring-offset-slate-950">
+                <GithubIcon className="h-4 w-4" />
+                GitHub
               </a>
-              <a href="mailto:allenisaisiddartha@gmail.com" target="_blank" rel="noopener noreferrer" className="text-emerald-500 hover:text-emerald-400 scale-125 transition-transform hover:scale-150">
-                <Mail />
+              <a href="mailto:allenisaisiddartha@gmail.com" className="inline-flex items-center gap-2 rounded-lg border border-emerald-300/25 bg-slate-950/35 px-3 py-2 text-sm font-medium text-emerald-200 transition-colors hover:border-[#00ffd0] hover:text-[#00ffd0] focus:outline-none focus:ring-2 focus:ring-[#00ffd0] focus:ring-offset-2 focus:ring-offset-slate-950">
+                <Mail className="h-4 w-4" />
+                Email
               </a>
             </div>
           </footer>
