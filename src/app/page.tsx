@@ -26,6 +26,7 @@ import {
   LuBriefcaseBusiness as BriefcaseIcon,
   LuGraduationCap as GraduationCapIcon,
   LuDownload as DownloadIcon,
+  LuMenu as MenuIcon,
 } from 'react-icons/lu';
 
 // TypeScript interfaces for project data and props
@@ -72,6 +73,7 @@ const Portfolio: React.FC<PortfolioProps> = ({ projects, achievements }) => {
   const [currentAchievementIndex, setCurrentAchievementIndex] = useState(0);
   const [selectedProject, setSelectedProject] = useState<Project | null>(null);
   const [projectFilter, setProjectFilter] = useState<'All' | 'Solo' | 'Group'>('All');
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const navRef = useRef<HTMLDivElement>(null);
   const navSelectionLock = useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -155,8 +157,18 @@ const Portfolio: React.FC<PortfolioProps> = ({ projects, achievements }) => {
     };
   }, [selectedProject]);
 
+  useEffect(() => {
+    const closeMobileMenuOnEscape = (e: KeyboardEvent) => {
+      if (e.key === 'Escape') setIsMobileMenuOpen(false);
+    };
+
+    window.addEventListener('keydown', closeMobileMenuOnEscape);
+    return () => window.removeEventListener('keydown', closeMobileMenuOnEscape);
+  }, []);
+
   const handleNavClick = (e: React.MouseEvent<HTMLAnchorElement>, href: string) => {
     e.preventDefault();
+    setIsMobileMenuOpen(false);
     setActiveTab(href);
     if (navSelectionLock.current) clearTimeout(navSelectionLock.current);
     // Keep the clicked item active through the smooth-scroll transition so the
@@ -214,14 +226,15 @@ const Portfolio: React.FC<PortfolioProps> = ({ projects, achievements }) => {
 
   return (
     <div className="min-h-screen bg-slate-950 flex flex-col items-center justify-center font-sans text-slate-200">
-      {/* Navigation - Occupies entire width of container, no visible borders */}
-      <nav className="fixed top-0 left-0 w-full z-40 bg-slate-950/90 backdrop-blur-lg flex justify-center">
-        <div className="w-full max-w-5xl flex relative" ref={navRef}>
+      {/* Navigation - horizontal tabs on tablet/desktop, compact menu on phones */}
+      <nav className="fixed top-0 left-0 w-full z-40 bg-slate-950/90 backdrop-blur-lg">
+        <div className="hidden w-full max-w-5xl md:flex md:relative md:mx-auto" ref={navRef}>
           {navItems.map((item) => (
             <a
               key={item.name}
               href={item.href}
               onClick={(e) => handleNavClick(e, item.href)}
+              aria-current={activeTab === item.href ? 'page' : undefined}
               className={`flex-1 text-center py-5 text-sm uppercase tracking-widest font-semibold transition duration-300 ${
                 activeTab === item.href ? 'text-[#00ffd0]' : 'text-slate-400 hover:text-emerald-300'
               }`}
@@ -234,6 +247,52 @@ const Portfolio: React.FC<PortfolioProps> = ({ projects, achievements }) => {
             className="absolute bottom-0 h-[3px] bg-[#00ffd0] transition-all duration-300 ease-out"
             style={{ left: indicatorStyle.left, width: indicatorStyle.width }}
           ></span>
+        </div>
+
+        <div className="md:hidden">
+          <div className="flex items-center justify-between px-5 py-3.5">
+            <a
+              href="#hero"
+              onClick={(e) => handleNavClick(e, '#hero')}
+              aria-label="Go to home section"
+              className="font-mono text-sm font-bold tracking-[0.24em] text-[#00ffd0] focus:outline-none focus:ring-2 focus:ring-[#00ffd0] focus:ring-offset-2 focus:ring-offset-slate-950"
+            >
+              SA
+            </a>
+            <button
+              type="button"
+              onClick={() => setIsMobileMenuOpen((isOpen) => !isOpen)}
+              aria-expanded={isMobileMenuOpen}
+              aria-controls="mobile-navigation"
+              aria-label={isMobileMenuOpen ? 'Close navigation menu' : 'Open navigation menu'}
+              className="inline-flex items-center gap-2 rounded-lg border border-emerald-300/30 px-3 py-2 text-xs font-semibold uppercase tracking-widest text-emerald-100 transition-colors hover:border-[#00ffd0] hover:text-[#00ffd0] focus:outline-none focus:ring-2 focus:ring-[#00ffd0] focus:ring-offset-2 focus:ring-offset-slate-950"
+            >
+              Menu
+              {isMobileMenuOpen ? <CloseIcon className="h-4 w-4" /> : <MenuIcon className="h-4 w-4" />}
+            </button>
+          </div>
+
+          {isMobileMenuOpen && (
+            <div id="mobile-navigation" className="border-t border-emerald-300/15 bg-slate-950/95 px-5 py-3 shadow-2xl shadow-slate-950/60">
+              <div className="mx-auto grid max-w-5xl gap-1">
+                {navItems.map((item) => (
+                  <a
+                    key={item.name}
+                    href={item.href}
+                    onClick={(e) => handleNavClick(e, item.href)}
+                    aria-current={activeTab === item.href ? 'page' : undefined}
+                    className={`rounded-lg px-4 py-3 text-sm font-semibold uppercase tracking-widest transition-colors focus:outline-none focus:ring-2 focus:ring-[#00ffd0] focus:ring-offset-2 focus:ring-offset-slate-950 ${
+                      activeTab === item.href
+                        ? 'bg-emerald-300/10 text-[#00ffd0]'
+                        : 'text-slate-300 hover:bg-slate-800 hover:text-emerald-200'
+                    }`}
+                  >
+                    {item.name}
+                  </a>
+                ))}
+              </div>
+            </div>
+          )}
         </div>
       </nav>
 
